@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.aregyan.compose"
