@@ -3,7 +3,8 @@ package com.smart.keuneunong.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.smart.keuneunong.ui.theme.JetpackComposeBoilerplateTheme
+import com.smart.keuneunong.ui.theme.SmartKeuneunongTheme
+import com.smart.keuneunong.ui.navigation.SmartKeuneunongNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -11,8 +12,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            JetpackComposeBoilerplateTheme {
-                ComposeApp()
+            SmartKeuneunongTheme {
+                SmartKeuneunongNavGraph()
             }
         }
     }
