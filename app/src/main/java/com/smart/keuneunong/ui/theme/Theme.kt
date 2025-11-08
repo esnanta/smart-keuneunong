@@ -3,22 +3,20 @@ package com.smart.keuneunong.ui.theme
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColorScheme(
     primary = Green700
 )
 
 private val LightColorPalette = lightColorScheme(
-    primary = Green700
-
-    /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
+    primary = Primary,
     onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+    primaryContainer = Color(0xFFEFF6FF),
+    background = Background,
+    onBackground = TextPrimary,
+    surface = Surface,
+    onSurface = TextPrimary
 )
 
 @Composable
