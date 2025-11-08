@@ -30,7 +30,7 @@ private val LightColorPalette = lightColorScheme(
 )
 
 @Composable
-fun JetpackComposeBoilerplateTheme(
+fun SmartKeuneunongTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {

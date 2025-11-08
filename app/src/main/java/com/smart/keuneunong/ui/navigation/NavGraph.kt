@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smart.keuneunong.ui.splash.SplashScreen
+import com.smart.keuneunong.ui.dashboard.DashboardScreen
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
@@ -33,7 +34,7 @@ fun SmartKeuneunongNavGraph(
 
         composable(Screen.Dashboard.route) {
             // Temporary placeholder
-            androidx.compose.material3.Text("Dashboard Coming Soon")
+            DashboardScreen()
         }
     }
 }
