@@ -10,13 +10,23 @@ private val DarkColorPalette = darkColorScheme(
 )
 
 private val LightColorPalette = lightColorScheme(
-    primary = Primary,
+    primary = Blue500,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFEFF6FF),
-    background = Background,
-    onBackground = TextPrimary,
-    surface = Surface,
-    onSurface = TextPrimary
+    primaryContainer = Blue100,
+    onPrimaryContainer = Blue900,
+
+    secondary = Green500,
+    onSecondary = Color.White,
+    secondaryContainer = Green100,
+    onSecondaryContainer = Green900,
+
+    background = Gray50,
+    onBackground = Gray900,
+
+    surface = Color.White,
+    onSurface = Gray900,
+    surfaceVariant = Gray100,
+    onSurfaceVariant = Gray500,
 )
 
 @Composable
