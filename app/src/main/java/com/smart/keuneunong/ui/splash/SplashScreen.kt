@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.smart.keuneunong.ui.theme.Blue200
 import com.smart.keuneunong.ui.theme.Blue300
@@ -44,7 +43,7 @@ import com.smart.keuneunong.ui.theme.Blue100
 @Composable
 fun SplashScreen(
     onSplashFinished: () -> Unit,
-    viewModel: SplashViewModel = hiltViewModel()
+    viewModel: SplashViewModel
 ) {
     val scale = remember { Animatable(0f) }
     val alpha = remember { Animatable(0f) }
