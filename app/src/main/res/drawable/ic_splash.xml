@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+
+    <!-- Cloud with Sun Icon - Clean and Modern -->
+    <!-- Background Circle (optional, subtle) -->
+    <path
+        android:pathData="M80,80 m-70,0 a70,70 0,1,1 140,0 a70,70 0,1,1 -140,0"
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.1"/>
+
+    <!-- Sun -->
+    <path
+        android:pathData="M105,45 m-15,0 a15,15 0,1,1 30,0 a15,15 0,1,1 -30,0"
+        android:fillColor="#FFD54F"/>
+
+    <!-- Sun rays (8 directions) -->
+    <path
+        android:pathData="M105,20 L105,28"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M105,62 L105,70"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M80,45 L88,45"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M122,45 L130,45"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M88.5,28.5 L94.5,34.5"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M115.5,55.5 L121.5,61.5"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M121.5,28.5 L115.5,34.5"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M94.5,55.5 L88.5,61.5"
+        android:strokeColor="#FFD54F"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+
+    <!-- Main Cloud -->
+    <path
+        android:pathData="M45,85 C45,78 50,72 57,72 C58,65 64,60 71,60 C78,60 84,65 85,72 C92,72 98,78 98,85 C98,92 92,98 85,98 L57,98 C50,98 45,92 45,85 Z"
+        android:fillColor="#E3F2FD"/>
+
+    <!-- Cloud Shadow/Depth -->
+    <path
+        android:pathData="M45,85 C45,78 50,72 57,72 C58,65 64,60 71,60 C78,60 84,65 85,72 C92,72 98,78 98,85 C98,92 92,98 85,98 L57,98 C50,98 45,92 45,85 Z"
+        android:fillColor="#90CAF9"
+        android:fillAlpha="0.3"/>
+
+    <!-- Cloud Outline for definition -->
+    <path
+        android:pathData="M45,85 C45,78 50,72 57,72 C58,65 64,60 71,60 C78,60 84,65 85,72 C92,72 98,78 98,85 C98,92 92,98 85,98 L57,98 C50,98 45,92 45,85 Z"
+        android:strokeColor="#90CAF9"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"/>
+
+</vector>
+

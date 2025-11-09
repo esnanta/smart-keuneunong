@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen Colors - Soft Maritime/Weather Theme -->
+    <color name="splash_background">#E3F2FD</color>  <!-- Very pale blue background -->
+    <color name="splash_icon_background">#FFFFFF</color>  <!-- White icon background (optional) -->
+
+    <!-- Legacy gradient colors (for reference, no longer used in modern splash) -->
+    <color name="splash_gradient_start">#60A5FA</color>
+    <color name="splash_gradient_end">#93C5FD</color>
+</resources>
+
