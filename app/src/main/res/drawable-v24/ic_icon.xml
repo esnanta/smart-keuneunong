@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="160dp"
     android:height="160dp"
     android:viewportWidth="160"
     android:viewportHeight="160">
 
-    <!-- Background -->
+    <!-- Background with gradient -->
     <path
-        android:pathData="M80,80 m-70,0 a70,70 0,1,1 140,0 a70,70 0,1,1 -140,0"
-        android:fillColor="#1A237E"
-        android:fillAlpha="0.1"/>
+        android:pathData="M80,80 m-70,0 a70,70 0,1,1 140,0 a70,70 0,1,1 -140,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="80"
+                android:centerY="80"
+                android:gradientRadius="70"
+                android:startColor="#261A237E"
+                android:endColor="#0D0D47A1"/>
+        </aapt:attr>
+    </path>
 
-    <!-- Crescent moon (upper left) -->
+    <!-- Crescent moon (upper left) with gradient -->
     <path
-        android:fillColor="#FFF59D"
         android:fillType="evenOdd"
         android:pathData="
             M55,50
@@ -23,7 +31,18 @@
             M64,50
             m-20,0
             a20,20 0 1,1 40,0
-            a20,20 0 1,1 -40,0" />
+            a20,20 0 1,1 -40,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="40"
+                android:startY="30"
+                android:endX="70"
+                android:endY="70"
+                android:startColor="#FFF9C4"
+                android:endColor="#FFF59D"/>
+        </aapt:attr>
+    </path>
 
     <!-- Moon rim -->
     <path
@@ -33,10 +52,8 @@
         android:fillColor="#00000000"
         android:strokeAlpha="0.25"/>
 
-    <!-- Cloud (lower right) -->
+    <!-- Cloud (lower right) with gradient -->
     <path
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.85"
         android:pathData="
             M105,100
             m-22,0
@@ -49,7 +66,18 @@
             M125,104
             m-12,0
             a12,12 0 1,1 24,0
-            a12,12 0 1,1 -24,0"/>
+            a12,12 0 1,1 -24,0">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="85"
+                android:startY="90"
+                android:endX="125"
+                android:endY="115"
+                android:startColor="#E6FFFFFF"
+                android:endColor="#CCF5F5F5"/>
+        </aapt:attr>
+    </path>
 
     <!-- Cloud subtle shadow -->
     <path
@@ -57,12 +85,12 @@
         android:fillColor="#000000"
         android:fillAlpha="0.05"/>
 
-    <!-- Star 1 -->
+    <!-- Star 1 with glow -->
     <path
         android:fillColor="#FFE082"
         android:pathData="M100,45 l2,5 l5,2 l-5,2 l-2,5 l-2,-5 l-5,-2 l5,-2 z"/>
 
-    <!-- Star 2 -->
+    <!-- Star 2 with glow -->
     <path
         android:fillColor="#FFF9C4"
         android:pathData="M35,70 l1.5,4 l4,1.5 l-4,1.5 l-1.5,4 l-1.5,-4 l-4,-1.5 l4,-1.5 z"/>
