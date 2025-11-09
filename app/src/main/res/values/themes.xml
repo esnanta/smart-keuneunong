@@ -4,5 +4,12 @@
     <style name="Theme.JetpackComposeBoilerplate" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/holo_green_dark</item>
     </style>
-</resources>
 
+    <!-- Launch / splash theme that shows a centered ic_icon drawable -->
+    <style name="Theme.Splash" parent="Theme.JetpackComposeBoilerplate">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!-- make sure no action bar during launch -->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+</resources>
