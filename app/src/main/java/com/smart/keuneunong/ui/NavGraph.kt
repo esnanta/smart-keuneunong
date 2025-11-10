@@ -16,7 +16,7 @@ sealed class Screen(val route: String) {
 }
 
 @Composable
-fun SmartKeuneunongNavGraph(
+fun NavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     NavHost(
