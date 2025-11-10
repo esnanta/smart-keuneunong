@@ -1,5 +1,4 @@
-
-package com.smart.keuneunong.ui.navigation
+package com.smart.keuneunong.ui
 
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel

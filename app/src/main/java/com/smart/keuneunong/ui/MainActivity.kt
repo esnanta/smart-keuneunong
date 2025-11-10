@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.smart.keuneunong.ui.theme.SmartKeuneunongTheme
-import com.smart.keuneunong.ui.navigation.SmartKeuneunongNavGraph
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
