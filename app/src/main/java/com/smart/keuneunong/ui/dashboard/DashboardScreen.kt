@@ -26,6 +26,9 @@ import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
+import com.smart.keuneunong.ui.weather.WeatherScreen
+import com.smart.keuneunong.ui.recommendation.RecommendationScreen
+import com.smart.keuneunong.ui.notification.NotificationScreen
 
 @Composable
 fun DashboardScreen(
@@ -35,7 +38,28 @@ fun DashboardScreen(
     var selectedTab by remember { mutableStateOf<Int>(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
+        // Content based on selected tab
+        when (selectedTab) {
+            0 -> DashboardContent(uiState, viewModel)
+            1 -> WeatherScreen()
+            2 -> RecommendationScreen()
+            3 -> NotificationScreen()
+        }
+
+        BottomNavigationBar(
+            selectedTab = selectedTab,
+            onTabSelected = { selectedTab = it },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
+}
+
+@Composable
+fun DashboardContent(
+    uiState: DashboardUiState,
+    viewModel: DashboardViewModel
+) {
+    LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Gray50)
@@ -227,12 +251,6 @@ fun DashboardScreen(
                 FaseKeuneunongCard()
             }
         }
-        BottomNavigationBar(
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
-    }
 }
 
 @Composable
