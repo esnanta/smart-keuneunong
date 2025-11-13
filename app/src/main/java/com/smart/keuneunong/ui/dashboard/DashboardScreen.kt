@@ -154,56 +154,6 @@ fun DashboardContent(
                 }
             }
 
-            // Feature Cards
-            item {
-                Text(
-                    text = "Fitur Utama",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Gray900
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "📅",
-                        title = "Kalender Keuneunong",
-                        description = "Lihat fase bulan tradisional"
-                    )
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🌤️",
-                        title = "Cuaca",
-                        description = "Prakiraan cuaca terkini"
-                    )
-                }
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🎣",
-                        title = "Rekomendasi",
-                        description = "Saran kegiatan harian"
-                    )
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "📱",
-                        title = "Notifikasi",
-                        description = "Pengingat penting"
-                    )
-                }
-            }
-
             // Calendar Section
             item {
                 CalendarComponent(
