@@ -323,7 +323,7 @@ fun CalendarCard() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Day headers
             Row(
@@ -342,7 +342,7 @@ fun CalendarCard() {
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Calendar Grid
             CalendarGrid(currentMonth, currentYear)
@@ -355,7 +355,7 @@ fun CalendarGrid(month: Int, year: Int) {
     val calendarDays = getCalendarDays(month, year)
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         calendarDays.chunked(7).forEach { week ->
             Row(
@@ -380,19 +380,19 @@ fun CalendarDayCell(
 ) {
     Box(
         modifier = modifier
-            .aspectRatio(1f)
-            .padding(2.dp),
+            .padding(1.dp),
         contentAlignment = Alignment.Center
     ) {
         if (dayData.day > 0) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 // Day number with highlight for current day
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(28.dp)
                         .then(
                             if (dayData.isToday) {
                                 Modifier
@@ -406,18 +406,19 @@ fun CalendarDayCell(
                 ) {
                     Text(
                         text = dayData.day.toString(),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         fontWeight = if (dayData.isToday) FontWeight.Bold else FontWeight.Normal,
-                        color = if (dayData.isToday) Color.White else Gray900
+                        color = if (dayData.isToday) Color.White else Gray900,
+                        fontSize = 14.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 // Weather icon
                 Text(
                     text = dayData.weatherEmoji,
-                    fontSize = 16.sp
+                    fontSize = 14.sp
                 )
 
                 // Special marker (checkmark for important days)
@@ -426,7 +427,7 @@ fun CalendarDayCell(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Special event",
                         tint = Green500,
-                        modifier = Modifier.size(12.dp)
+                        modifier = Modifier.size(10.dp)
                     )
                 }
             }
