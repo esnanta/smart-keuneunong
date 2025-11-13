@@ -74,155 +74,101 @@ fun DashboardContent(
     viewModel: DashboardViewModel,
     contentPadding: PaddingValues
 ) {
+    val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+    val greeting = when (currentHour) {
+        in 5..11 -> "Selamat Pagi ☀️"
+        in 12..15 -> "Selamat Siang 🌤️"
+        in 16..18 -> "Selamat Sore 🌇"
+        else -> "Selamat Malam 🌙"
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50)
-            .padding(contentPadding)
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .background(Color(0xFFF6F8FB))
+            .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Header
-        // Header modern dengan background gradient & greeting
+        /** ---------- HEADER MODERN ---------- **/
         item {
-            val gradientBrush = Brush.horizontalGradient(
-                colors = listOf(Color(0xFF64B5F6), Color(0xFF1976D2))
-            )
-
-            Card(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(8.dp, RoundedCornerShape(24.dp)),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFF5B8DEF), Color(0xFF4E65D9))
+                        ),
+                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
+                    )
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .background(brush = gradientBrush)
-                        .padding(horizontal = 20.dp, vertical = 24.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "Selamat datang 👋",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFFE3F2FD)
-                            )
-                            Text(
-                                text = "Smart Keuneunong",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFFBBDEFB)
-                            )
-                        }
-
-                        IconButton(
-                            onClick = { /* TODO: Settings Action */ },
-                            modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.25f), shape = RoundedCornerShape(12.dp))
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Pengaturan",
-                                tint = Color.White
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-
-        // Welcome Card
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(8.dp, RoundedCornerShape(28.dp)),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Blue500
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "🌙",
-                            fontSize = 48.sp
-                        )
-                        Text(
-                            text = "Selamat Datang di",
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Blue100
+                            text = greeting,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFFE3F2FD)
                         )
                         Text(
                             text = "Smart Keuneunong",
-                            style = MaterialTheme.typography.headlineMedium,
+                            style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Kalender Cerdas Tradisional Aceh",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Blue100
+                            text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFBBDEFB)
                         )
+                    }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                    // Mini weather info
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Default.Cloud,
+                            contentDescription = "Cuaca",
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Text("28°C", color = Color.White, style = MaterialTheme.typography.labelSmall)
+                    }
 
-                        // Current date info
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White.copy(alpha = 0.2f)
-                            ),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    text = "Hari ini",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Blue100
-                                )
-                                Text(
-                                    text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "Fase: Keuneunong Muda 🌙",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Blue100
-                                )
-                            }
-                        }
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    IconButton(
+                        onClick = { /* TODO: Settings */ },
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.25f), shape = RoundedCornerShape(12.dp))
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Pengaturan",
+                            tint = Color.White
+                        )
                     }
                 }
             }
         }
 
-        // Calendar Section
+        /** ---------- QUICK INFO CARDS ---------- **/
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                QuickStatCard(icon = "📅", title = "Bulan", value = viewModel.getMonthName(uiState.currentMonth), modifier = Modifier.weight(1f))
+                QuickStatCard(icon = "🌕", title = "Keuneunong", value = "Muda", modifier = Modifier.weight(1f))
+                QuickStatCard(icon = "📍", title = "Lokasi", value = "Aceh", modifier = Modifier.weight(1f))
+            }
+        }
+
+        /** ---------- KALENDER ---------- **/
         item {
             CalendarComponent(
                 currentMonth = uiState.currentMonth,
@@ -234,46 +180,74 @@ fun DashboardContent(
             )
         }
 
-
-        // Fase Keuneunong Card
+        /** ---------- FASE KEUNEUNONG ---------- **/
         item {
             FaseKeuneunongCard()
         }
 
-        // Info Card
+        /** ---------- TENTANG ---------- **/
         item {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(4.dp, RoundedCornerShape(20.dp)),
+                    .padding(horizontal = 16.dp)
+                    .shadow(3.dp, RoundedCornerShape(20.dp)),
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Green50
-                )
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp)
                 ) {
                     Text(
-                        text = "📚 Tentang Keuneunong",
+                        text = "📖 Tentang Keuneunong",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = Green700
+                        color = Color(0xFF1E293B)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Green600
+                        color = Color(0xFF475569)
                     )
                 }
             }
         }
-        item {
-            Spacer(modifier = Modifier.height(1.dp))
+
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+    }
+}
+
+@Composable
+fun QuickStatCard(icon: String, title: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .padding(vertical = 4.dp)
+            .shadow(2.dp, RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = icon, fontSize = 24.sp)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = title,
+                color = Color(0xFF64748B),
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                text = value,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF1E293B),
+                style = MaterialTheme.typography.titleSmall
+            )
         }
     }
 }
+
 
 @Composable
 fun BottomNavigationBar(
