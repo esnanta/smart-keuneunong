@@ -72,12 +72,15 @@ fun LocationPickerScreen(
         )
 
         if (!uiState.hasLocationPermission) {
+            timber.log.Timber.d("LocationPicker: Requesting location permission")
             permissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             )
+        } else {
+            timber.log.Timber.d("LocationPicker: Location permission already granted")
         }
     }
 
@@ -191,11 +194,22 @@ fun LocationPickerScreen(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                     properties = MapProperties(
-                        isMyLocationEnabled = uiState.hasLocationPermission
+                        isMyLocationEnabled = uiState.hasLocationPermission,
+                        // Optimize map loading
+                        isTrafficEnabled = false,
+                        isIndoorEnabled = false,
+                        isBuildingEnabled = true,
+                        minZoomPreference = 5f,
+                        maxZoomPreference = 20f
                     ),
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = true,
-                        myLocationButtonEnabled = false
+                        myLocationButtonEnabled = false,
+                        compassEnabled = true,
+                        rotationGesturesEnabled = false,
+                        tiltGesturesEnabled = false,
+                        // Reduce unnecessary map features
+                        mapToolbarEnabled = false
                     ),
                     onMapClick = { latLng ->
                         uiState = uiState.copy(selectedLocation = latLng)
@@ -315,19 +329,24 @@ private suspend fun getCurrentLocation(
     fusedLocationClient: FusedLocationProviderClient
 ): LatLng? = suspendCoroutine { continuation ->
     try {
+        timber.log.Timber.d("LocationPicker: Requesting current location")
         fusedLocationClient.getCurrentLocation(
             Priority.PRIORITY_HIGH_ACCURACY,
             null
         ).addOnSuccessListener { location ->
             if (location != null) {
+                timber.log.Timber.d("LocationPicker: Location received - Lat: ${location.latitude}, Lng: ${location.longitude}")
                 continuation.resume(LatLng(location.latitude, location.longitude))
             } else {
+                timber.log.Timber.w("LocationPicker: Location is null")
                 continuation.resume(null)
             }
-        }.addOnFailureListener { _ ->
+        }.addOnFailureListener { exception ->
+            timber.log.Timber.e(exception, "LocationPicker: Failed to get location")
             continuation.resume(null)
         }
-    } catch (_: Exception) {
+    } catch (e: Exception) {
+        timber.log.Timber.e(e, "LocationPicker: Exception in getCurrentLocation")
         continuation.resume(null)
     }
 }

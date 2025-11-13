@@ -19,3 +19,20 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Google Maps and Play Services
+-keep class com.google.android.gms.maps.** { *; }
+-keep interface com.google.android.gms.maps.** { *; }
+-dontwarn com.google.android.gms.**
+
+# Google Play Services
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+# Keep location services
+-keep class com.google.android.gms.location.** { *; }
+-keep interface com.google.android.gms.location.** { *; }
+
+# Keep Maps Compose
+-keep class com.google.maps.android.compose.** { *; }
+-dontwarn com.google.maps.android.compose.**
