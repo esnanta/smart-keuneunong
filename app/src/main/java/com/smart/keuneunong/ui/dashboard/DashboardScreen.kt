@@ -26,9 +26,15 @@ import androidx.compose.ui.unit.sp
 import com.smart.keuneunong.data.model.CalendarDayData
 import com.smart.keuneunong.ui.theme.*
 import com.smart.keuneunong.utils.DateUtils
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(
+    viewModel: DashboardViewModel = hiltViewModel()
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -107,7 +113,7 @@ fun DashboardScreen() {
                                     color = Blue100
                                 )
                                 Text(
-                                    text = "${DateUtils.getCurrentDay()} ${DateUtils.getMonthName(DateUtils.getCurrentMonth())} ${DateUtils.getCurrentYear()}",
+                                    text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     color = Color.White
@@ -176,7 +182,14 @@ fun DashboardScreen() {
 
         // Calendar Section
         item {
-            CalendarCard()
+            CalendarCard(
+                currentMonth = uiState.currentMonth,
+                currentYear = uiState.currentYear,
+                calendarDays = uiState.calendarDays,
+                onPreviousMonth = viewModel::onPreviousMonth,
+                onNextMonth = viewModel::onNextMonth,
+                getMonthName = viewModel::getMonthName
+            )
         }
 
         // Info Card
@@ -251,10 +264,14 @@ fun FeatureCard(
 }
 
 @Composable
-fun CalendarCard() {
-    var currentMonth by remember { mutableStateOf(11) } // November
-    var currentYear by remember { mutableStateOf(2025) }
-
+fun CalendarCard(
+    currentMonth: Int,
+    currentYear: Int,
+    calendarDays: List<CalendarDayData>,
+    onPreviousMonth: () -> Unit,
+    onNextMonth: () -> Unit,
+    getMonthName: (Int) -> String
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -273,16 +290,7 @@ fun CalendarCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = {
-                        if (currentMonth == 1) {
-                            currentMonth = 12
-                            currentYear--
-                        } else {
-                            currentMonth--
-                        }
-                    }
-                ) {
+                IconButton(onClick = onPreviousMonth) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                         contentDescription = "Previous month",
@@ -306,16 +314,7 @@ fun CalendarCard() {
                     )
                 }
 
-                IconButton(
-                    onClick = {
-                        if (currentMonth == 12) {
-                            currentMonth = 1
-                            currentYear++
-                        } else {
-                            currentMonth++
-                        }
-                    }
-                ) {
+                IconButton(onClick = onNextMonth) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = "Next month",
@@ -346,15 +345,13 @@ fun CalendarCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             // Calendar Grid
-            CalendarGrid(currentMonth, currentYear)
+            CalendarGrid(calendarDays)
         }
     }
 }
 
 @Composable
-fun CalendarGrid(month: Int, year: Int) {
-    val calendarDays = getCalendarDays(month, year)
-
+fun CalendarGrid(calendarDays: List<CalendarDayData>) {
     Column(
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
@@ -435,94 +432,3 @@ fun CalendarDayCell(
         }
     }
 }
-
-fun getCalendarDays(month: Int, year: Int): List<CalendarDayData> {
-    val days = mutableListOf<CalendarDayData>()
-
-    // Get first day of month (0 = Sunday, 1 = Monday, etc.)
-    val firstDayOfWeek = getFirstDayOfMonth(month, year)
-
-    // Get number of days in month
-    val daysInMonth = getDaysInMonth(month, year)
-
-    // Add empty cells for days before month starts
-    repeat(firstDayOfWeek) {
-        days.add(CalendarDayData(day = 0))
-    }
-
-    // Add days of the month with sample weather data
-    for (day in 1..daysInMonth) {
-        val isToday = (day == 8 && month == 11 && year == 2025) // November 8 as shown in image
-        val weatherEmoji = when {
-            day in listOf(3, 10, 17, 24) -> "🌧️"
-            day in listOf(2, 7, 9, 11, 14, 18, 21, 25, 27) -> "⛅"
-            day in listOf(16, 23, 29) -> "☁️"
-            else -> "☀️"
-        }
-        val hasSpecialEvent = day in listOf(15, 22)
-
-        days.add(
-            CalendarDayData(
-                day = day,
-                isToday = isToday,
-                weatherEmoji = weatherEmoji,
-                hasSpecialEvent = hasSpecialEvent
-            )
-        )
-    }
-
-    // Add empty cells to complete the last week (make sure we have full rows of 7)
-    val totalCells = days.size
-    val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
-    repeat(remainingCells) {
-        days.add(CalendarDayData(day = 0))
-    }
-
-    return days
-}
-
-fun getFirstDayOfMonth(month: Int, year: Int): Int {
-    // Simplified calculation - returns day of week (0-6, Sunday-Saturday)
-    // For November 2025, it starts on Saturday (6)
-    if (month == 11 && year == 2025) return 6
-
-    // Basic Zeller's congruence for other dates
-    val m = if (month < 3) month + 12 else month
-    val y = if (month < 3) year - 1 else year
-    val k = y % 100
-    val j = y / 100
-    val h = (1 + (13 * (m + 1)) / 5 + k + k / 4 + j / 4 - 2 * j) % 7
-    return (h + 6) % 7 // Convert to 0=Sunday format
-}
-
-fun getDaysInMonth(month: Int, year: Int): Int {
-    return when (month) {
-        1, 3, 5, 7, 8, 10, 12 -> 31
-        4, 6, 9, 11 -> 30
-        2 -> if (isLeapYear(year)) 29 else 28
-        else -> 30
-    }
-}
-
-fun isLeapYear(year: Int): Boolean {
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
-}
-
-fun getMonthName(month: Int): String {
-    return when (month) {
-        1 -> "Januari"
-        2 -> "Februari"
-        3 -> "Maret"
-        4 -> "April"
-        5 -> "Mei"
-        6 -> "Juni"
-        7 -> "Juli"
-        8 -> "Agustus"
-        9 -> "September"
-        10 -> "Oktober"
-        11 -> "November"
-        12 -> "Desember"
-        else -> "Unknown"
-    }
-}
-
