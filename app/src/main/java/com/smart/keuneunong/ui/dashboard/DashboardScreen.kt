@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.rememberCoroutineScope
+import com.smart.keuneunong.ui.components.QuickStatCard
 import kotlinx.coroutines.launch
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
@@ -203,9 +204,24 @@ fun DashboardContent(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                QuickStatCard(icon = "📅", title = "Bulan", value = viewModel.getMonthName(uiState.currentMonth), modifier = Modifier.weight(1f))
-                QuickStatCard(icon = "🌕", title = "Keuneunong", value = "Muda", modifier = Modifier.weight(1f))
-                QuickStatCard(icon = "📍", title = "Lokasi", value = "Aceh", modifier = Modifier.weight(1f))
+                QuickStatCard(
+                    icon = "📅",
+                    title = "Bulan",
+                    value = viewModel.getMonthName(uiState.currentMonth),
+                    modifier = Modifier.weight(1f)
+                )
+                QuickStatCard(
+                    icon = "🌕",
+                    title = "Keuneunong",
+                    value = "Muda",
+                    modifier = Modifier.weight(1f)
+                )
+                QuickStatCard(
+                    icon = "📍",
+                    title = "Lokasi",
+                    value = "Aceh",
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
 
@@ -230,43 +246,9 @@ fun DashboardContent(
             }
         }
 
-
         item { Spacer(modifier = Modifier.height(24.dp)) }
     }
 }
-
-@Composable
-fun QuickStatCard(icon: String, title: String, value: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
-            .padding(vertical = 4.dp)
-            .shadow(2.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = icon, fontSize = 24.sp)
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = title,
-                color = Color(0xFF64748B),
-                style = MaterialTheme.typography.labelSmall
-            )
-            Text(
-                text = value,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF1E293B),
-                style = MaterialTheme.typography.titleSmall
-            )
-        }
-    }
-}
-
 
 @Composable
 fun BottomNavigationBar(
