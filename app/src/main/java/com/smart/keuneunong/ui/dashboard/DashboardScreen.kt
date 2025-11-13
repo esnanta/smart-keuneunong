@@ -25,9 +25,9 @@ import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -139,7 +139,7 @@ fun DashboardContent(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp) // Memberi jarak antar baris
                 ) {
-                    // BARIS 1: Greeting dan Tombol Menu sejajar
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -165,10 +165,6 @@ fun DashboardContent(
                         }
                     }
 
-                    // PERBAIKAN: BARIS 2 (Icon cuaca dan suhu) dihapus sesuai permintaan.
-                    // Judul sekarang langsung di bawah baris 1.
-
-                    // BARIS 2 (Sebelumnya BARIS 3): Judul Smart Keuneunong dan icon cuaca kanan
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -188,10 +184,9 @@ fun DashboardContent(
                             )
                         }
 
-                        // Icon cuaca kecil di kanan
                         Icon(
                             imageVector = Icons.Default.Cloud,
-                            contentDescription = null, // Sesuai permintaan: icon cuaca di kanan
+                            contentDescription = null,
                             tint = Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.size(28.dp)
                         )
@@ -477,8 +472,8 @@ fun DrawerContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         NavigationDrawerItem(
-            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-            label = { Text("Pengaturan") },
+            icon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+            label = { Text("Lokasi Pengguna") },
             selected = false,
             onClick = onSettingsClick
         )
