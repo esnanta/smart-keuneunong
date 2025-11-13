@@ -477,6 +477,13 @@ fun getCalendarDays(month: Int, year: Int): List<CalendarDayData> {
         )
     }
 
+    // Add empty cells to complete the last week (make sure we have full rows of 7)
+    val totalCells = days.size
+    val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
+    repeat(remainingCells) {
+        days.add(CalendarDayData(day = 0))
+    }
+
     return days
 }
 
