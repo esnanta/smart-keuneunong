@@ -215,6 +215,9 @@ fun DashboardContent(
                 }
             }
         }
+        item {
+            Spacer(modifier = Modifier.height(1.dp))
+        }
     }
 }
 
