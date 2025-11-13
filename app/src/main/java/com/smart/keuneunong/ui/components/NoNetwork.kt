@@ -19,6 +19,7 @@ fun NoNetwork() {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .navigationBarsPadding()
             .padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {

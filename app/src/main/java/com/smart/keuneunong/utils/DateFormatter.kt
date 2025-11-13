@@ -1,4 +1,4 @@
-package com.smart.keuneunong.util
+package com.smart.keuneunong.utils
 
 import java.text.SimpleDateFormat
 import java.util.*

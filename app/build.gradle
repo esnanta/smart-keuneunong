@@ -19,6 +19,16 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        // Load Google Maps API Key from local.properties
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.withInputStream { localProperties.load(it) }
+        }
+        manifestPlaceholders = [
+            MAPS_API_KEY: localProperties.getProperty('MAPS_API_KEY', 'YOUR_API_KEY_HERE')
+        ]
     }
 
     buildTypes {
@@ -105,4 +115,10 @@ dependencies {
 
     //==================== Memory Leak Detection ====================
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
+
+    //==================== Location & Maps ====================
+    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    implementation 'com.google.maps.android:maps-compose:4.3.3'
+    implementation 'com.google.android.gms:play-services-maps:18.2.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 }

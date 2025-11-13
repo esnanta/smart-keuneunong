@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smart.keuneunong.ui.theme.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,186 +25,240 @@ import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.runtime.rememberCoroutineScope
+import com.smart.keuneunong.ui.components.QuickStatCard
+import kotlinx.coroutines.launch
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
+import com.smart.keuneunong.ui.location.LocationPickerScreen
+import com.smart.keuneunong.ui.location.LocationViewModel
+import timber.log.Timber
 
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    locationViewModel: LocationViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val locationState = locationViewModel.selectedLocation.collectAsStateWithLifecycle().value
     var selectedTab by remember { mutableStateOf<Int>(0) }
+    var showAboutDialog by remember { mutableStateOf(false) }
+    var showLocationPicker by remember { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Content based on selected tab
-        when (selectedTab) {
-            0 -> DashboardContent(uiState, viewModel)
-            1 -> WeatherScreen()
-            2 -> RecommendationScreen()
-            3 -> NotificationScreen()
-        }
+    // About Dialog
+    if (showAboutDialog) {
+        AboutDialog(onDismiss = { showAboutDialog = false })
+    }
 
-        BottomNavigationBar(
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier.align(Alignment.BottomCenter)
+    // Location Picker Screen
+    if (showLocationPicker) {
+        LocationPickerScreen(
+            onLocationSelected = { location ->
+                // Save location using ViewModel
+                locationViewModel.saveLocation(location.latitude, location.longitude)
+                Timber.d("Location saved: Lat=${location.latitude}, Lng=${location.longitude}")
+                showLocationPicker = false
+            },
+            onNavigateBack = {
+                showLocationPicker = false
+            }
         )
+        return // Don't render the rest of the dashboard when showing location picker
+    }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(
+                    onLocationClick = {
+                        scope.launch { drawerState.close() }
+                        showLocationPicker = true
+                    },
+                    onAboutClick = {
+                        scope.launch { drawerState.close() }
+                        showAboutDialog = true
+                    }
+                )
+            }
+        }
+    ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets.systemBars,
+            bottomBar = {
+                BottomNavigationBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it }
+                )
+            }
+        ) { innerPadding ->
+            // Content based on selected tab
+            when (selectedTab) {
+                0 -> DashboardContent(uiState, locationState, viewModel, innerPadding) {
+                    scope.launch { drawerState.open() }
+                }
+                1 -> Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)) { WeatherScreen() }
+                2 -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) { RecommendationScreen() }
+
+                3 -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) { NotificationScreen() }
+            }
+        }
     }
 }
 
 @Composable
 fun DashboardContent(
     uiState: DashboardUiState,
-    viewModel: DashboardViewModel
+    locationState: com.smart.keuneunong.ui.location.LocationState,
+    viewModel: DashboardViewModel,
+    contentPadding: PaddingValues,
+    onMenuClick: () -> Unit
 ) {
-    LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Gray50)
-                .padding(bottom = 80.dp, start = 16.dp, end = 16.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header
-            item {
-                Text(
-                    text = "Smart Keuneunong",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Gray900
-                )
-            }
+    val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+    val greeting = when (currentHour) {
+        in 5..11 -> "Selamat Pagi ☀️"
+        in 12..15 -> "Selamat Siang 🌤️"
+        in 16..18 -> "Selamat Sore 🌇"
+        else -> "Selamat Malam 🌙"
+    }
 
-            // Welcome Card
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(8.dp, RoundedCornerShape(28.dp)),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Blue500
+    // Get location display name
+    val locationDisplay = when (locationState) {
+        is com.smart.keuneunong.ui.location.LocationState.Success -> {
+            getLocationName(locationState.latitude, locationState.longitude)
+        }
+        else -> "Lhokseumawe" // Default location (5.1801, 97.1507)
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF6F8FB))
+            .padding(contentPadding),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color(0xFF5B8DEF), Color(0xFF4E65D9))
+                        ),
+                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
                     )
+                    .padding(horizontal = 20.dp, vertical = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp) // Memberi jarak antar baris
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        Text(
+                            text = greeting,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color(0xFFE3F2FD),
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        IconButton(
+                            onClick = onMenuClick,
+                            modifier = Modifier
+                                .size(20.dp)
                         ) {
-                            Text(
-                                text = "🌙",
-                                fontSize = 48.sp
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = Color.White
                             )
-                            Text(
-                                text = "Selamat Datang di",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Blue100
-                            )
+                        }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
                             Text(
                                 text = "Smart Keuneunong",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                text = "Kalender Cerdas Tradisional Aceh",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Blue100
+                                text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFBBDEFB)
                             )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            // Current date info
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White.copy(alpha = 0.2f)
-                            ),
-                                shape = RoundedCornerShape(16.dp)
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "Hari ini",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Blue100
-                                    )
-                                    Text(
-                                        text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = "Fase: Keuneunong Muda 🌙",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Blue100
-                                    )
-                                }
-                            }
                         }
+
+                        Icon(
+                            imageVector = Icons.Default.Cloud,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(28.dp)
+                        )
                     }
                 }
             }
+        }
 
-            // Feature Cards
-            item {
-                Text(
-                    text = "Fitur Utama",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Gray900
+        /** ---------- QUICK INFO CARDS ---------- **/
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                QuickStatCard(
+                    icon = com.smart.keuneunong.utils.DateUtils.getCurrentDay().toString(),
+                    title = "Bulan",
+                    value = com.smart.keuneunong.utils.DateUtils.getMonthName(com.smart.keuneunong.utils.DateUtils.getCurrentMonth()),
+                    modifier = Modifier.weight(1f)
+                )
+                QuickStatCard(
+                    icon = "🌕",
+                    title = "Keuneunong",
+                    value = "Muda",
+                    modifier = Modifier.weight(1f)
+                )
+                QuickStatCard(
+                    icon = "📍",
+                    title = "Lokasi",
+                    value = locationDisplay,
+                    modifier = Modifier.weight(1f)
                 )
             }
+        }
 
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "📅",
-                        title = "Kalender Keuneunong",
-                        description = "Lihat fase bulan tradisional"
-                    )
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🌤️",
-                        title = "Cuaca",
-                        description = "Prakiraan cuaca terkini"
-                    )
-                }
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "🎣",
-                        title = "Rekomendasi",
-                        description = "Saran kegiatan harian"
-                    )
-                    FeatureCard(
-                        modifier = Modifier.weight(1f),
-                        emoji = "📱",
-                        title = "Notifikasi",
-                        description = "Pengingat penting"
-                    )
-                }
-            }
-
-            // Calendar Section
-            item {
+        /** ---------- KALENDER ---------- **/
+        item {
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                 CalendarComponent(
                     currentMonth = uiState.currentMonth,
                     currentYear = uiState.currentYear,
@@ -215,46 +268,25 @@ fun DashboardContent(
                     getMonthName = viewModel::getMonthName
                 )
             }
+        }
 
-            // Info Card
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Green50
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        Text(
-                            text = "📚 Tentang Keuneunong",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Green700
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Green600
-                        )
-                    }
-                }
-            }
-
-            // Fase Keuneunong Card
-            item {
+        /** ---------- FASE KEUNEUNONG ---------- **/
+        item {
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                 FaseKeuneunongCard()
             }
         }
+
+        item { Spacer(modifier = Modifier.height(24.dp)) }
+    }
 }
 
 @Composable
-fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun BottomNavigationBar(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     NavigationBar(
         modifier = modifier
             .fillMaxWidth()
@@ -339,45 +371,6 @@ fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit, modifier
 }
 
 @Composable
-fun FeatureCard(
-    modifier: Modifier = Modifier,
-    emoji: String,
-    title: String,
-    description: String
-) {
-    Card(
-        modifier = modifier
-            .shadow(4.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = emoji,
-                fontSize = 32.sp
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = Gray900
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = Gray500
-            )
-        }
-    }
-}
-
-@Composable
 fun FaseKeuneunongCard() {
     Card(
         modifier = Modifier
@@ -419,38 +412,6 @@ fun FaseKeuneunongCard() {
                 date = "22 November",
                 description = "Kondisi laut aman untuk nelayan"
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            // Integrasi Data
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color(0xFFE3F2FD),
-                        shape = RoundedCornerShape(14.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Row(verticalAlignment = Alignment.Top) {
-                    Text(
-                        text = "\uD83C\uDF0E", // 🌎
-                        fontSize = 28.sp,
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "Integrasi Data",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF1976D2)
-                        )
-                        Text(
-                            text = "Data cuaca dari BMKG • Pasang surut dari observasi lokal • Fase keuneunong berdasarkan perhitungan tradisional Aceh",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF1976D2)
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -490,4 +451,176 @@ fun FaseInfoRow(icon: String, title: String, date: String, description: String) 
             )
         }
     }
+}
+
+@Composable
+fun DrawerContent(
+    onLocationClick: () -> Unit,
+    onAboutClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Smart Keuneunong",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1976D2)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Kalender Tradisional Aceh",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF64748B)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+            label = { Text("Lokasi Pengguna") },
+            selected = false,
+            onClick = onLocationClick
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Default.Info, contentDescription = null) },
+            label = { Text("Tentang Aplikasi") },
+            selected = false,
+            onClick = onAboutClick
+        )
+    }
+}
+
+@Composable
+fun AboutDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Tutup", color = Color(0xFF1976D2))
+            }
+        },
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "📖",
+                    fontSize = 24.sp
+                )
+                Text(
+                    text = "Tentang Keuneunong",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E293B)
+                )
+            }
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF475569)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Fitur Aplikasi:",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E293B)
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = "• Kalender berbasis fase bulan",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Informasi cuaca terkini",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Rekomendasi aktivitas pertanian",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Notifikasi fase bulan penting",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                }
+            }
+        },
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White
+    )
+}
+
+/**
+ * Get location name based on coordinates
+ * Maps coordinates to known cities in Aceh or returns generic "Aceh"
+ */
+private fun getLocationName(latitude: Double, longitude: Double): String {
+    val acehnesseCities = listOf(
+        // Format: Triple(lat, lng, nama kota)
+        Triple(5.5577, 95.3222, "Banda Aceh"),
+        Triple(5.1801, 97.1507, "Lhokseumawe"),
+        Triple(5.0915, 97.3174, "Langsa"),
+        Triple(4.1721, 96.2524, "Meulaboh"),
+        Triple(3.9670, 97.0253, "Tapaktuan"),
+        Triple(4.3726, 97.7925, "Singkil"),
+        Triple(5.5291, 96.9490, "Bireuen"),
+        Triple(4.5159, 96.4167, "Calang"),
+        Triple(5.1895, 96.7446, "Sigli"),
+        Triple(4.9637, 97.6274, "Idi"),
+        Triple(5.3090, 96.8097, "Lhoksukon"),
+        Triple(4.6951, 96.2493, "Jantho"),
+        Triple(4.3588, 97.1953, "Blangkejeren"),
+        Triple(4.0329, 96.8157, "Kutacane"),
+        Triple(5.0260, 97.4012, "Kuala Simpang"),
+        Triple(4.8401, 97.1534, "Takengon"),
+        Triple(5.2491, 96.5039, "Lhoknga"),
+        Triple(5.4560, 95.6203, "Sabang")
+    )
+
+    // Toleransi jarak dalam derajat (sekitar 5-10 km)
+    val tolerance = 0.1
+
+    // Cari kota terdekat
+    for ((cityLat, cityLng, cityName) in acehnesseCities) {
+        val latDiff = kotlin.math.abs(latitude - cityLat)
+        val lngDiff = kotlin.math.abs(longitude - cityLng)
+
+        // Jika koordinat dekat dengan salah satu kota
+        if (latDiff <= tolerance && lngDiff <= tolerance) {
+            return cityName
+        }
+    }
+
+    // Default "Aceh"
+    return "Aceh"
 }
