@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smart.keuneunong.data.model.CalendarDayData
 import com.smart.keuneunong.ui.theme.*
 import com.smart.keuneunong.utils.DateUtils
 
@@ -434,13 +435,6 @@ fun CalendarDayCell(
         }
     }
 }
-
-data class CalendarDayData(
-    val day: Int,
-    val isToday: Boolean = false,
-    val weatherEmoji: String = "☀️",
-    val hasSpecialEvent: Boolean = false
-)
 
 fun getCalendarDays(month: Int, year: Int): List<CalendarDayData> {
     val days = mutableListOf<CalendarDayData>()
