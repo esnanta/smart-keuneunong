@@ -41,8 +41,14 @@ fun DashboardScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var selectedTab by remember { mutableStateOf<Int>(0) }
+    var showAboutDialog by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // About Dialog
+    if (showAboutDialog) {
+        AboutDialog(onDismiss = { showAboutDialog = false })
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -55,7 +61,7 @@ fun DashboardScreen(
                     },
                     onAboutClick = {
                         scope.launch { drawerState.close() }
-                        // TODO: Navigate to about
+                        showAboutDialog = true
                     }
                 )
             }
@@ -229,34 +235,6 @@ fun DashboardContent(
             }
         }
 
-        /** ---------- TENTANG ---------- **/
-        item {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .shadow(3.dp, RoundedCornerShape(20.dp)),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-                    Text(
-                        text = "📖 Tentang Keuneunong",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF1E293B)
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF475569)
-                    )
-                }
-            }
-        }
 
         item { Spacer(modifier = Modifier.height(24.dp)) }
     }
@@ -516,3 +494,78 @@ fun DrawerContent(
     }
 }
 
+@Composable
+fun AboutDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Tutup", color = Color(0xFF1976D2))
+            }
+        },
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "📖",
+                    fontSize = 24.sp
+                )
+                Text(
+                    text = "Tentang Keuneunong",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E293B)
+                )
+            }
+        },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color(0xFF475569)
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Fitur Aplikasi:",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1E293B)
+                )
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = "• Kalender berbasis fase bulan",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Informasi cuaca terkini",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Rekomendasi aktivitas pertanian",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                    Text(
+                        text = "• Notifikasi fase bulan penting",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF475569)
+                    )
+                }
+            }
+        },
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White
+    )
+}
