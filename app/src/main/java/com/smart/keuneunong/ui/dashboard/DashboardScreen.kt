@@ -210,6 +210,11 @@ fun DashboardScreen(
                 }
             }
         }
+
+        // Fase Keuneunong Card
+        item {
+            FaseKeuneunongCard()
+        }
     }
 }
 
@@ -247,6 +252,121 @@ fun FeatureCard(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
                 color = Gray500
+            )
+        }
+    }
+}
+
+@Composable
+fun FaseKeuneunongCard() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(4.dp, RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = "Fase Keuneunong Bulan Ini",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF222B45)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            // Musim Tanam
+            FaseInfoRow(
+                icon = "\uD83C\uDF31", // 🌱
+                title = "Musim Tanam",
+                date = "8 November",
+                description = "Waktu penanaman padi dan palawija"
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            // Musim Hujan
+            FaseInfoRow(
+                icon = "\uD83C\uDF27\uFE0F", // 🌧️
+                title = "Musim Hujan",
+                date = "15 November",
+                description = "Curah hujan meningkat"
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            // Waktu Melaut
+            FaseInfoRow(
+                icon = "\uD83C\uDF0A", // 🌊
+                title = "Waktu Melaut",
+                date = "22 November",
+                description = "Kondisi laut aman untuk nelayan"
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            // Integrasi Data
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = Color(0xFFE3F2FD),
+                        shape = RoundedCornerShape(14.dp)
+                    )
+                    .padding(16.dp)
+            ) {
+                Row(verticalAlignment = Alignment.Top) {
+                    Text(
+                        text = "\uD83C\uDF0E", // 🌎
+                        fontSize = 28.sp,
+                        modifier = Modifier.padding(end = 10.dp)
+                    )
+                    Column {
+                        Text(
+                            text = "Integrasi Data",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF1976D2)
+                        )
+                        Text(
+                            text = "Data cuaca dari BMKG • Pasang surut dari observasi lokal • Fase keuneunong berdasarkan perhitungan tradisional Aceh",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF1976D2)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun FaseInfoRow(icon: String, title: String, date: String, description: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Color(0xFFF5F7FA),
+                shape = RoundedCornerShape(14.dp)
+            )
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .background(Color.White, shape = RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = icon, fontSize = 28.sp)
+        }
+        Spacer(modifier = Modifier.width(14.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF222B45)
+            )
+            Text(
+                text = "$date • $description",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color(0xFF6B7280)
             )
         }
     }
