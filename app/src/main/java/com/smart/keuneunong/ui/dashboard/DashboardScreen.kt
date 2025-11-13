@@ -26,6 +26,8 @@ import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.graphics.Brush
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
@@ -81,14 +83,66 @@ fun DashboardContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Header
+        // Header modern dengan background gradient & greeting
         item {
-            Text(
-                text = "Smart Keuneunong",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = Gray900
+            val gradientBrush = Brush.horizontalGradient(
+                colors = listOf(Color(0xFF64B5F6), Color(0xFF1976D2))
             )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(24.dp)),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(brush = gradientBrush)
+                        .padding(horizontal = 20.dp, vertical = 24.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Selamat datang 👋",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color(0xFFE3F2FD)
+                            )
+                            Text(
+                                text = "Smart Keuneunong",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFBBDEFB)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { /* TODO: Settings Action */ },
+                            modifier = Modifier
+                                .background(Color.White.copy(alpha = 0.25f), shape = RoundedCornerShape(12.dp))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Pengaturan",
+                                tint = Color.White
+                            )
+                        }
+                    }
+                }
+            }
         }
+
 
         // Welcome Card
         item {
