@@ -37,174 +37,193 @@ fun DashboardScreen(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var selectedTab by remember { mutableStateOf<Int>(0) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
+        }
+    ) { innerPadding ->
         // Content based on selected tab
         when (selectedTab) {
-            0 -> DashboardContent(uiState, viewModel)
-            1 -> WeatherScreen()
-            2 -> RecommendationScreen()
-            3 -> NotificationScreen()
-        }
+            0 -> DashboardContent(uiState, viewModel, innerPadding)
+            1 -> Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)) { WeatherScreen() }
+            2 -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) { RecommendationScreen() }
 
-        BottomNavigationBar(
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+            3 -> Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) { NotificationScreen() }
+        }
     }
 }
 
 @Composable
 fun DashboardContent(
     uiState: DashboardUiState,
-    viewModel: DashboardViewModel
+    viewModel: DashboardViewModel,
+    contentPadding: PaddingValues
 ) {
     LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Gray50)
-                .padding(bottom = 80.dp, start = 16.dp, end = 16.dp, top = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Header
-            item {
-                Text(
-                    text = "Smart Keuneunong",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Gray900
-                )
-            }
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Gray50)
+            .padding(contentPadding)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Header
+        item {
+            Text(
+                text = "Smart Keuneunong",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = Gray900
+            )
+        }
 
-            // Welcome Card
-            item {
-                Card(
+        // Welcome Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(8.dp, RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Blue500
+                )
+            ) {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .shadow(8.dp, RoundedCornerShape(28.dp)),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Blue500
-                    )
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "🌙",
-                                fontSize = 48.sp
-                            )
-                            Text(
-                                text = "Selamat Datang di",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Blue100
-                            )
-                            Text(
-                                text = "Smart Keuneunong",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "Kalender Cerdas Tradisional Aceh",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Blue100
-                            )
+                        Text(
+                            text = "🌙",
+                            fontSize = 48.sp
+                        )
+                        Text(
+                            text = "Selamat Datang di",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Blue100
+                        )
+                        Text(
+                            text = "Smart Keuneunong",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            text = "Kalender Cerdas Tradisional Aceh",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Blue100
+                        )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                            // Current date info
-                            Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Color.White.copy(alpha = 0.2f)
+                        // Current date info
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = Color.White.copy(alpha = 0.2f)
                             ),
-                                shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Column(
-                                    modifier = Modifier.padding(16.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "Hari ini",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Blue100
-                                    )
-                                    Text(
-                                        text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = "Fase: Keuneunong Muda 🌙",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = Blue100
-                                    )
-                                }
+                                Text(
+                                    text = "Hari ini",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Blue100
+                                )
+                                Text(
+                                    text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "Fase: Keuneunong Muda 🌙",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Blue100
+                                )
                             }
                         }
                     }
                 }
             }
+        }
 
-            // Calendar Section
-            item {
-                CalendarComponent(
-                    currentMonth = uiState.currentMonth,
-                    currentYear = uiState.currentYear,
-                    calendarDays = uiState.calendarDays,
-                    onPreviousMonth = viewModel::onPreviousMonth,
-                    onNextMonth = viewModel::onNextMonth,
-                    getMonthName = viewModel::getMonthName
+        // Calendar Section
+        item {
+            CalendarComponent(
+                currentMonth = uiState.currentMonth,
+                currentYear = uiState.currentYear,
+                calendarDays = uiState.calendarDays,
+                onPreviousMonth = viewModel::onPreviousMonth,
+                onNextMonth = viewModel::onNextMonth,
+                getMonthName = viewModel::getMonthName
+            )
+        }
+
+
+        // Fase Keuneunong Card
+        item {
+            FaseKeuneunongCard()
+        }
+
+        // Info Card
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(4.dp, RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Green50
                 )
-            }
-
-            // Info Card
-            item {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(4.dp, RoundedCornerShape(20.dp)),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Green50
-                    )
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        Text(
-                            text = "📚 Tentang Keuneunong",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Green700
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Green600
-                        )
-                    }
+                    Text(
+                        text = "📚 Tentang Keuneunong",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Green700
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Keuneunong adalah sistem kalender tradisional Aceh yang mengikuti fase bulan untuk menentukan waktu terbaik berbagai aktivitas seperti bercocok tanam, melaut, dan upacara adat.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Green600
+                    )
                 }
             }
-
-            // Fase Keuneunong Card
-            item {
-                FaseKeuneunongCard()
-            }
         }
+    }
 }
 
 @Composable
-fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun BottomNavigationBar(
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     NavigationBar(
         modifier = modifier
             .fillMaxWidth()
@@ -289,45 +308,6 @@ fun BottomNavigationBar(selectedTab: Int, onTabSelected: (Int) -> Unit, modifier
 }
 
 @Composable
-fun FeatureCard(
-    modifier: Modifier = Modifier,
-    emoji: String,
-    title: String,
-    description: String
-) {
-    Card(
-        modifier = modifier
-            .shadow(4.dp, RoundedCornerShape(20.dp)),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = emoji,
-                fontSize = 32.sp
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.SemiBold,
-                color = Gray900
-            )
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodySmall,
-                color = Gray500
-            )
-        }
-    }
-}
-
-@Composable
 fun FaseKeuneunongCard() {
     Card(
         modifier = Modifier
@@ -369,38 +349,6 @@ fun FaseKeuneunongCard() {
                 date = "22 November",
                 description = "Kondisi laut aman untuk nelayan"
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            // Integrasi Data
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = Color(0xFFE3F2FD),
-                        shape = RoundedCornerShape(14.dp)
-                    )
-                    .padding(16.dp)
-            ) {
-                Row(verticalAlignment = Alignment.Top) {
-                    Text(
-                        text = "\uD83C\uDF0E", // 🌎
-                        fontSize = 28.sp,
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-                    Column {
-                        Text(
-                            text = "Integrasi Data",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF1976D2)
-                        )
-                        Text(
-                            text = "Data cuaca dari BMKG • Pasang surut dari observasi lokal • Fase keuneunong berdasarkan perhitungan tradisional Aceh",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF1976D2)
-                        )
-                    }
-                }
-            }
         }
     }
 }
