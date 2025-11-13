@@ -35,14 +35,19 @@ import kotlinx.coroutines.launch
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
+import com.smart.keuneunong.ui.location.LocationPickerScreen
+import com.smart.keuneunong.ui.location.LocationViewModel
+import timber.log.Timber
 
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    locationViewModel: LocationViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var selectedTab by remember { mutableStateOf<Int>(0) }
     var showAboutDialog by remember { mutableStateOf(false) }
+    var showLocationPicker by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -51,14 +56,30 @@ fun DashboardScreen(
         AboutDialog(onDismiss = { showAboutDialog = false })
     }
 
+    // Location Picker Screen
+    if (showLocationPicker) {
+        LocationPickerScreen(
+            onLocationSelected = { location ->
+                // Save location using ViewModel
+                locationViewModel.saveLocation(location.latitude, location.longitude)
+                Timber.d("Location saved: Lat=${location.latitude}, Lng=${location.longitude}")
+                showLocationPicker = false
+            },
+            onNavigateBack = {
+                showLocationPicker = false
+            }
+        )
+        return // Don't render the rest of the dashboard when showing location picker
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
                 DrawerContent(
-                    onSettingsClick = {
+                    onLocationClick = {
                         scope.launch { drawerState.close() }
-                        // TODO: Navigate to settings
+                        showLocationPicker = true
                     },
                     onAboutClick = {
                         scope.launch { drawerState.close() }
@@ -424,7 +445,7 @@ fun FaseInfoRow(icon: String, title: String, date: String, description: String) 
 
 @Composable
 fun DrawerContent(
-    onSettingsClick: () -> Unit,
+    onLocationClick: () -> Unit,
     onAboutClick: () -> Unit
 ) {
     Column(
@@ -459,7 +480,7 @@ fun DrawerContent(
             icon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
             label = { Text("Lokasi Pengguna") },
             selected = false,
-            onClick = onSettingsClick
+            onClick = onLocationClick
         )
 
         Spacer(modifier = Modifier.height(8.dp))
