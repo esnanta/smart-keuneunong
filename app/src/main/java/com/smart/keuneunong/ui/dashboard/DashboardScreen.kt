@@ -26,7 +26,11 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
@@ -37,33 +41,55 @@ fun DashboardScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     var selectedTab by remember { mutableStateOf<Int>(0) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Scaffold(
-        contentWindowInsets = WindowInsets.systemBars,
-        bottomBar = {
-            BottomNavigationBar(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
-            )
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(
+                    onSettingsClick = {
+                        scope.launch { drawerState.close() }
+                        // TODO: Navigate to settings
+                    },
+                    onAboutClick = {
+                        scope.launch { drawerState.close() }
+                        // TODO: Navigate to about
+                    }
+                )
+            }
         }
-    ) { innerPadding ->
-        // Content based on selected tab
-        when (selectedTab) {
-            0 -> DashboardContent(uiState, viewModel, innerPadding)
-            1 -> Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)) { WeatherScreen() }
-            2 -> Box(
-                modifier = Modifier
+    ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets.systemBars,
+            bottomBar = {
+                BottomNavigationBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { selectedTab = it }
+                )
+            }
+        ) { innerPadding ->
+            // Content based on selected tab
+            when (selectedTab) {
+                0 -> DashboardContent(uiState, viewModel, innerPadding) {
+                    scope.launch { drawerState.open() }
+                }
+                1 -> Box(modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-            ) { RecommendationScreen() }
+                    .padding(innerPadding)) { WeatherScreen() }
+                2 -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) { RecommendationScreen() }
 
-            3 -> Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) { NotificationScreen() }
+                3 -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) { NotificationScreen() }
+            }
         }
     }
 }
@@ -72,7 +98,8 @@ fun DashboardScreen(
 fun DashboardContent(
     uiState: DashboardUiState,
     viewModel: DashboardViewModel,
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    onMenuClick: () -> Unit
 ) {
     val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
     val greeting = when (currentHour) {
@@ -90,7 +117,7 @@ fun DashboardContent(
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        /** ---------- HEADER MODERN ---------- **/
+        /** ---------- HEADER MODERN (DIPERBAIKI) ---------- **/
         item {
             Box(
                 modifier = Modifier
@@ -104,52 +131,69 @@ fun DashboardContent(
                     )
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp) // Memberi jarak antar baris
                 ) {
-                    Column(modifier = Modifier.weight(1f)) {
+                    // BARIS 1: Greeting dan Tombol Menu sejajar
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
                             text = greeting,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFFE3F2FD)
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color(0xFFE3F2FD),
+                            fontWeight = FontWeight.Medium
                         )
-                        Text(
-                            text = "Smart Keuneunong",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFBBDEFB)
-                        )
+
+                        IconButton(
+                            onClick = onMenuClick,
+                            modifier = Modifier
+                                .size(20.dp) // <-- PERBAIKAN: Ukuran icon diatur
+                                .background(
+                                    Color.White.copy(alpha = 0.25f),
+                                    shape = RoundedCornerShape(12.dp)
+                                )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = Color.White
+                            )
+                        }
                     }
 
-                    // Mini weather info
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // PERBAIKAN: BARIS 2 (Icon cuaca dan suhu) dihapus sesuai permintaan.
+                    // Judul sekarang langsung di bawah baris 1.
+
+                    // BARIS 2 (Sebelumnya BARIS 3): Judul Smart Keuneunong dan icon cuaca kanan
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column {
+                            Text(
+                                text = "Smart Keuneunong",
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFBBDEFB)
+                            )
+                        }
+
+                        // Icon cuaca kecil di kanan
                         Icon(
                             imageVector = Icons.Default.Cloud,
-                            contentDescription = "Cuaca",
-                            tint = Color.White,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text("28°C", color = Color.White, style = MaterialTheme.typography.labelSmall)
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    IconButton(
-                        onClick = { /* TODO: Settings */ },
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.25f), shape = RoundedCornerShape(12.dp))
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Pengaturan",
-                            tint = Color.White
+                            contentDescription = null, // Sesuai permintaan: icon cuaca di kanan
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
@@ -426,3 +470,55 @@ fun FaseInfoRow(icon: String, title: String, date: String, description: String) 
         }
     }
 }
+
+@Composable
+fun DrawerContent(
+    onSettingsClick: () -> Unit,
+    onAboutClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            text = "Smart Keuneunong",
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1976D2)
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Kalender Tradisional Aceh",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color(0xFF64748B)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+            label = { Text("Pengaturan") },
+            selected = false,
+            onClick = onSettingsClick
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Default.Info, contentDescription = null) },
+            label = { Text("Tentang Aplikasi") },
+            selected = false,
+            onClick = onAboutClick
+        )
+    }
+}
+
