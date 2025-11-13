@@ -245,7 +245,9 @@ fun QuickStatCard(icon: String, title: String, value: String, modifier: Modifier
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 16.dp, horizontal = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = icon, fontSize = 24.sp)
