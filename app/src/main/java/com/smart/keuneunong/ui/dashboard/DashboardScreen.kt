@@ -117,12 +117,10 @@ fun DashboardContent(
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        /** ---------- HEADER MODERN (DIPERBAIKI) ---------- **/
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(Color(0xFF5B8DEF), Color(0xFF4E65D9))
@@ -151,11 +149,7 @@ fun DashboardContent(
                         IconButton(
                             onClick = onMenuClick,
                             modifier = Modifier
-                                .size(20.dp) // <-- PERBAIKAN: Ukuran icon diatur
-                                .background(
-                                    Color.White.copy(alpha = 0.25f),
-                                    shape = RoundedCornerShape(12.dp)
-                                )
+                                .size(20.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
