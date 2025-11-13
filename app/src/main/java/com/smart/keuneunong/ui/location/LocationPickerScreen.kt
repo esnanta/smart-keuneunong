@@ -37,10 +37,7 @@ fun LocationPickerScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
-    var hasLocationPermission by remember { mutableStateOf(false) }
-    var isLoadingLocation by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var uiState by remember { mutableStateOf(LocationUIState()) }
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
@@ -52,7 +49,7 @@ fun LocationPickerScreen(
 
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            selectedLocation ?: defaultLocation,
+            uiState.selectedLocation ?: defaultLocation,
             15f
         )
     }
@@ -60,17 +57,21 @@ fun LocationPickerScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
-        hasLocationPermission = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
 
-        if (!hasLocationPermission) {
-            errorMessage = "Izin lokasi diperlukan untuk menggunakan fitur ini"
-        }
+        uiState = uiState.copy(
+            hasLocationPermission = granted,
+            errorMessage = if (!granted) "Izin lokasi diperlukan untuk menggunakan fitur ini" else null
+        )
     }
 
     LaunchedEffect(Unit) {
-        hasLocationPermission = checkLocationPermission(context)
-        if (!hasLocationPermission) {
+        uiState = uiState.copy(
+            hasLocationPermission = checkLocationPermission(context)
+        )
+
+        if (!uiState.hasLocationPermission) {
             permissionLauncher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -101,10 +102,10 @@ fun LocationPickerScreen(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (selectedLocation != null) {
+                if (uiState.selectedLocation != null) {
                     FloatingActionButton(
                         onClick = {
-                            selectedLocation?.let { location ->
+                            uiState.selectedLocation?.let { location ->
                                 onLocationSelected(location)
                             }
                         },
@@ -117,33 +118,43 @@ fun LocationPickerScreen(
                     }
                 }
 
-                if (hasLocationPermission) {
+                if (uiState.hasLocationPermission) {
                     FloatingActionButton(
                         onClick = {
                             coroutineScope.launch {
-                                isLoadingLocation = true
-                                errorMessage = null
+                                uiState = uiState.copy(
+                                    isLoadingLocation = true,
+                                    errorMessage = null
+                                )
+
                                 try {
                                     val location = getCurrentLocation(fusedLocationClient)
                                     if (location != null) {
-                                        selectedLocation = location
+                                        uiState = uiState.copy(
+                                            selectedLocation = location,
+                                            isLoadingLocation = false
+                                        )
                                         cameraPositionState.animate(
                                             CameraUpdateFactory.newLatLngZoom(location, 17f),
                                             durationMs = 1000
                                         )
                                     } else {
-                                        errorMessage = "Tidak dapat mendapatkan lokasi saat ini"
+                                        uiState = uiState.copy(
+                                            isLoadingLocation = false,
+                                            errorMessage = "Tidak dapat mendapatkan lokasi saat ini"
+                                        )
                                     }
                                 } catch (e: Exception) {
-                                    errorMessage = "Error: ${e.message}"
-                                } finally {
-                                    isLoadingLocation = false
+                                    uiState = uiState.copy(
+                                        isLoadingLocation = false,
+                                        errorMessage = "Error: ${e.message}"
+                                    )
                                 }
                             }
                         },
                         containerColor = MaterialTheme.colorScheme.secondary
                     ) {
-                        if (isLoadingLocation) {
+                        if (uiState.isLoadingLocation) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(24.dp),
                                 color = MaterialTheme.colorScheme.onSecondary
@@ -164,7 +175,7 @@ fun LocationPickerScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            if (!hasLocationPermission) {
+            if (!uiState.hasLocationPermission) {
                 PermissionDeniedContent(
                     onRequestPermission = {
                         permissionLauncher.launch(
@@ -180,17 +191,17 @@ fun LocationPickerScreen(
                     modifier = Modifier.fillMaxSize(),
                     cameraPositionState = cameraPositionState,
                     properties = MapProperties(
-                        isMyLocationEnabled = hasLocationPermission
+                        isMyLocationEnabled = uiState.hasLocationPermission
                     ),
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = true,
                         myLocationButtonEnabled = false
                     ),
                     onMapClick = { latLng ->
-                        selectedLocation = latLng
+                        uiState = uiState.copy(selectedLocation = latLng)
                     }
                 ) {
-                    selectedLocation?.let { location ->
+                    uiState.selectedLocation?.let { location ->
                         Marker(
                             state = MarkerState(position = location),
                             title = "Lokasi Terpilih",
@@ -199,7 +210,7 @@ fun LocationPickerScreen(
                     }
                 }
 
-                if (selectedLocation != null) {
+                if (uiState.selectedLocation != null) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -220,24 +231,26 @@ fun LocationPickerScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "Latitude: ${String.format(Locale.US, "%.6f", selectedLocation?.latitude)}",
+                                text = "Latitude: ${String.format(Locale.US, "%.6f", uiState.selectedLocation?.latitude)}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Text(
-                                text = "Longitude: ${String.format(Locale.US, "%.6f", selectedLocation?.longitude)}",
+                                text = "Longitude: ${String.format(Locale.US, "%.6f", uiState.selectedLocation?.longitude)}",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
                 }
 
-                errorMessage?.let { message ->
+                uiState.errorMessage?.let { message ->
                     Snackbar(
                         modifier = Modifier
                             .padding(16.dp)
                             .align(Alignment.TopCenter),
                         action = {
-                            TextButton(onClick = { errorMessage = null }) {
+                            TextButton(onClick = {
+                                uiState = uiState.copy(errorMessage = null)
+                            }) {
                                 Text("Tutup")
                             }
                         }
