@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.smart.keuneunong.ui.theme.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -40,6 +39,7 @@ fun DashboardScreen(
     var selectedTab by remember { mutableStateOf<Int>(0) }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.systemBars,
         bottomBar = {
             BottomNavigationBar(
                 selectedTab = selectedTab,
@@ -87,6 +87,7 @@ fun DashboardContent(
             .fillMaxSize()
             .background(Color(0xFFF6F8FB))
             .padding(contentPadding),
+        contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         /** ---------- HEADER MODERN ---------- **/
@@ -94,6 +95,7 @@ fun DashboardContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(Color(0xFF5B8DEF), Color(0xFF4E65D9))
@@ -170,19 +172,23 @@ fun DashboardContent(
 
         /** ---------- KALENDER ---------- **/
         item {
-            CalendarComponent(
-                currentMonth = uiState.currentMonth,
-                currentYear = uiState.currentYear,
-                calendarDays = uiState.calendarDays,
-                onPreviousMonth = viewModel::onPreviousMonth,
-                onNextMonth = viewModel::onNextMonth,
-                getMonthName = viewModel::getMonthName
-            )
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                CalendarComponent(
+                    currentMonth = uiState.currentMonth,
+                    currentYear = uiState.currentYear,
+                    calendarDays = uiState.calendarDays,
+                    onPreviousMonth = viewModel::onPreviousMonth,
+                    onNextMonth = viewModel::onNextMonth,
+                    getMonthName = viewModel::getMonthName
+                )
+            }
         }
 
         /** ---------- FASE KEUNEUNONG ---------- **/
         item {
-            FaseKeuneunongCard()
+            Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                FaseKeuneunongCard()
+            }
         }
 
         /** ---------- TENTANG ---------- **/
