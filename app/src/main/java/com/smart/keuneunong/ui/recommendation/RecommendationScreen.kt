@@ -11,13 +11,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smart.keuneunong.ui.components.AppHeader
 import com.smart.keuneunong.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.smart.keuneunong.utils.DateUtils
 
 @Composable
 fun RecommendationScreen(
+    paddingValues: PaddingValues = PaddingValues(),
+    openDrawer: () -> Unit = {},
     viewModel: RecommendationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -25,7 +29,9 @@ fun RecommendationScreen(
     when (uiState) {
         is RecommendationUiState.Loading -> {
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
@@ -34,7 +40,9 @@ fun RecommendationScreen(
         is RecommendationUiState.Error -> {
             val message = (uiState as RecommendationUiState.Error).message
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = message, color = MaterialTheme.colorScheme.error)
@@ -46,58 +54,54 @@ fun RecommendationScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Gray50)
-                    .padding(16.dp),
+                    .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-
                 item {
-                    Text(
-                        text = "Rekomendasi Aktivitas",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Berdasarkan Keuneunong Saat Ini",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Gray500
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-
-                item {
-                    CurrentKeuneunongCard(
-                        periodName = data.periodName,
-                        description = data.periodDescription
+                    AppHeader(
+                        title = "Smart Keuneunong",
+                        subtitle = DateUtils.getCurrentDateFormatted(),
+                        showGreeting = true,
+                        onMenuClick = openDrawer
                     )
                 }
 
                 item {
-                    Text(
-                        text = "Rekomendasi Sektor",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900
-                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                items(data.sectorRecommendations.size) { idx ->
-                    val sector = data.sectorRecommendations[idx]
-                    RecommendationCard(
-                        title = sector.title,
-                        icon = sector.icon,
-                        recommendations = sector.recommendations,
-                        notes = sector.notes
-                    )
+                    item {
+                        CurrentKeuneunongCard(
+                            periodName = data.periodName,
+                            description = data.periodDescription
+                        )
+                    }
+
+                    item {
+                        Text(
+                            text = "Rekomendasi Sektor",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontWeight = FontWeight.Bold,
+                            color = Gray900
+                        )
+                    }
+
+                    items(data.sectorRecommendations.size) { idx ->
+                        val sector = data.sectorRecommendations[idx]
+                        RecommendationCard(
+                            title = sector.title,
+                            icon = sector.icon,
+                            recommendations = sector.recommendations,
+                            notes = sector.notes
+                        )
+                    }
                 }
             }
         }
     }
-}
 
 @Composable
 fun CurrentKeuneunongCard(periodName: String, description: String) {
@@ -164,7 +168,7 @@ fun RecommendationCard(
 
 
             if (notes != null) {
-                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
                 RecommendationItem(text = notes, isRecommended = false)
             }
         }

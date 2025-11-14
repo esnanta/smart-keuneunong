@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,7 +26,9 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-import kotlinx.coroutines.launch
+import com.smart.keuneunong.ui.components.AboutDialog
+import com.smart.keuneunong.ui.components.AppScaffold
+import com.smart.keuneunong.ui.components.DrawerContent
 import java.util.Locale
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -36,13 +40,13 @@ fun LocationPickerScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showAboutDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var uiState by remember { mutableStateOf(LocationUIState()) }
     val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
-
-    val coroutineScope = rememberCoroutineScope()
 
     // Lhokseumawe, Aceh
     val defaultLocation = LatLng(5.1801, 97.1507)
@@ -84,8 +88,20 @@ fun LocationPickerScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
+    if (showAboutDialog) {
+        AboutDialog(onDismiss = { showAboutDialog = false })
+    }
+
+    AppScaffold(
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerContent(
+                    onLocationClick = { /* Implement if needed */ },
+                    onAboutClick = { showAboutDialog = true }
+                )
+            }
+        },
+        topBar = { openDrawer ->
             TopAppBar(
                 title = { Text("Pilih Lokasi") },
                 navigationIcon = {
@@ -93,86 +109,20 @@ fun LocationPickerScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
                     }
                 },
+                actions = {
+                    IconButton(onClick = openDrawer) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                    containerColor = Color(0xFF5B8DEF),
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
-        },
-        floatingActionButton = {
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (uiState.selectedLocation != null) {
-                    FloatingActionButton(
-                        onClick = {
-                            uiState.selectedLocation?.let { location ->
-                                onLocationSelected(location)
-                            }
-                        },
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Konfirmasi Lokasi"
-                        )
-                    }
-                }
-
-                if (uiState.hasLocationPermission) {
-                    FloatingActionButton(
-                        onClick = {
-                            coroutineScope.launch {
-                                uiState = uiState.copy(
-                                    isLoadingLocation = true,
-                                    errorMessage = null
-                                )
-
-                                try {
-                                    val location = getCurrentLocation(fusedLocationClient)
-                                    if (location != null) {
-                                        uiState = uiState.copy(
-                                            selectedLocation = location,
-                                            isLoadingLocation = false
-                                        )
-                                        cameraPositionState.animate(
-                                            CameraUpdateFactory.newLatLngZoom(location, 17f),
-                                            durationMs = 1000
-                                        )
-                                    } else {
-                                        uiState = uiState.copy(
-                                            isLoadingLocation = false,
-                                            errorMessage = "Tidak dapat mendapatkan lokasi saat ini"
-                                        )
-                                    }
-                                } catch (e: Exception) {
-                                    uiState = uiState.copy(
-                                        isLoadingLocation = false,
-                                        errorMessage = "Error: ${e.message}"
-                                    )
-                                }
-                            }
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ) {
-                        if (uiState.isLoadingLocation) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = MaterialTheme.colorScheme.onSecondary
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.MyLocation,
-                                contentDescription = "Gunakan Lokasi Saya"
-                            )
-                        }
-                    }
-                }
-            }
         }
-    ) { paddingValues ->
+    ) { paddingValues, openDrawer ->
         Box(
             modifier = modifier
                 .fillMaxSize()
@@ -350,4 +300,3 @@ private suspend fun getCurrentLocation(
         continuation.resume(null)
     }
 }
-

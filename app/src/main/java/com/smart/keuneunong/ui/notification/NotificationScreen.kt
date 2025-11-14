@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.smart.keuneunong.ui.components.AppHeader
 import com.smart.keuneunong.ui.theme.*
+import com.smart.keuneunong.utils.DateUtils
 
 
 data class NotificationData(
@@ -28,7 +30,6 @@ data class NotificationData(
     val iconColor: Color
 )
 
-// Data sampel untuk notifikasi
 val sampleNotifications = listOf(
     NotificationData(
         id = 1,
@@ -36,7 +37,7 @@ val sampleNotifications = listOf(
         message = "Prediksi curah hujan tinggi dan berangin, sebaiknya jangan ke laut hari ini.",
         timestamp = "Baru saja",
         icon = Icons.Default.Warning,
-        iconColor = Color(0xFFD32F2F) // Merah untuk peringatan
+        iconColor = Color(0xFFD32F2F)
     ),
     NotificationData(
         id = 2,
@@ -44,7 +45,7 @@ val sampleNotifications = listOf(
         message = "Memasuki 'Keuneunong Ròt' (Keuneunong 3). Waktu yang baik untuk mulai mengolah sawah dan menanam padi.",
         timestamp = "2 jam lalu",
         icon = Icons.Default.Info,
-        iconColor = Color(0xFF1976D2) // Biru untuk info
+        iconColor = Color(0xFF1976D2)
     ),
     NotificationData(
         id = 3,
@@ -52,7 +53,7 @@ val sampleNotifications = listOf(
         message = "Waspada musim 'Keuneunong Boh Kayèe' (Keuneunong 9). Perhatikan irigasi untuk tanaman palawija Anda.",
         timestamp = "1 hari lalu",
         icon = Icons.Default.WbSunny,
-        iconColor = Color(0xFFFFA000) // Oranye/Amber untuk cuaca
+        iconColor = Color(0xFFFFA000)
     ),
     NotificationData(
         id = 4,
@@ -65,46 +66,43 @@ val sampleNotifications = listOf(
 )
 
 @Composable
-fun NotificationScreen() {
-    Column(
+fun NotificationScreen(
+    paddingValues: PaddingValues = PaddingValues(),
+    openDrawer: () -> Unit = {}
+) {
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50) // Latar belakang dari file asli
+            .background(Gray50)
+            .padding(paddingValues)
     ) {
-        // Judul Halaman
-        Text(
-            text = "Notifikasi",
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            color = Gray900, // Warna dari file asli
-            modifier = Modifier.padding(16.dp)
-        )
+        item {
+            AppHeader(
+                title = "Smart Keuneunong",
+                subtitle = DateUtils.getCurrentDateFormatted(),
+                showGreeting = true,
+                onMenuClick = openDrawer
+            )
+        }
 
-        // Daftar Notifikasi
         if (sampleNotifications.isEmpty()) {
-            // Tampilan jika tidak ada notifikasi
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Tidak ada notifikasi baru.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Gray500 // Warna dari file asli
-                )
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Tidak ada notifikasi baru.",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Gray500
+                    )
+                }
             }
         } else {
-            // Tampilan daftar notifikasi
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(sampleNotifications) { notification ->
-                    NotificationItem(notification = notification)
-                }
+            items(sampleNotifications) { notification ->
+                NotificationItem(notification = notification)
             }
         }
     }

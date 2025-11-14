@@ -62,4 +62,15 @@ object DateUtils {
             else -> "☀️"
         }
     }
+
+    /**
+     * Get formatted current date string (e.g., "14 November 2025")
+     */
+    fun getCurrentDateFormatted(): String {
+        val calendar = Calendar.getInstance()
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val year = calendar.get(Calendar.YEAR)
+        return "$day ${getMonthName(month)} $year"
+    }
 }
