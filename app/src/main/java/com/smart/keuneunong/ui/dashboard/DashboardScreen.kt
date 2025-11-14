@@ -169,7 +169,7 @@ fun DashboardContent(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp) // Memberi jarak antar baris
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
                     Row(
@@ -501,6 +501,62 @@ fun DrawerContent(
             selected = false,
             onClick = onAboutClick
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+        HorizontalDivider()
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Bintang Kala",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1976D2)
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        val devs = listOf(
+            Triple("Nantha Seutia", "Programmer", "NS"),
+            Triple("Syahrul Hamdi", "Programmer", "SH"),
+            Triple("Rahmatsyah", "Pegiat Budaya Aceh", "R"),
+            Triple("Nyakman Lamjame", "Pegiat Budaya Aceh", "NL"),
+            Triple("Reny Fharina", "Pegiat Budaya Aceh", "RF")
+        )
+        devs.forEach { (name, role, initials) ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(
+                            color = Color(0xFF1976D2),
+                            shape = RoundedCornerShape(20.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = initials,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = role,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF64748B)
+                    )
+                }
+            }
+        }
     }
 }
 
