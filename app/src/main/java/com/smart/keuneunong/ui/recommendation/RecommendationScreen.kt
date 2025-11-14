@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smart.keuneunong.ui.components.AppHeader
+import com.smart.keuneunong.ui.components.ErrorState
+import com.smart.keuneunong.ui.components.LoadingState
 import com.smart.keuneunong.ui.theme.*
 import com.smart.keuneunong.utils.DateUtils
 
@@ -27,8 +29,11 @@ fun RecommendationScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     when (uiState) {
-        is RecommendationUiState.Loading -> LoadingState(paddingValues)
-        is RecommendationUiState.Error -> ErrorState((uiState as RecommendationUiState.Error).message, paddingValues)
+        is RecommendationUiState.Loading -> LoadingState(modifier = Modifier.padding(paddingValues))
+        is RecommendationUiState.Error -> ErrorState(
+            message = (uiState as RecommendationUiState.Error).message,
+            modifier = Modifier.padding(paddingValues)
+        )
         is RecommendationUiState.Success -> SuccessState(
             data = uiState as RecommendationUiState.Success,
             paddingValues = paddingValues,
@@ -37,29 +42,6 @@ fun RecommendationScreen(
     }
 }
 
-@Composable
-private fun LoadingState(paddingValues: PaddingValues) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorState(message: String, paddingValues: PaddingValues) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = message, color = MaterialTheme.colorScheme.error)
-    }
-}
 
 @Composable
 private fun SuccessState(

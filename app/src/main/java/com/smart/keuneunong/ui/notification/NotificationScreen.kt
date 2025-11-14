@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.smart.keuneunong.ui.components.AppHeader
+import com.smart.keuneunong.ui.components.ErrorState
+import com.smart.keuneunong.ui.components.LoadingState
 import com.smart.keuneunong.ui.theme.*
 import com.smart.keuneunong.utils.DateUtils
 
@@ -70,39 +72,50 @@ fun NotificationScreen(
     paddingValues: PaddingValues = PaddingValues(),
     openDrawer: () -> Unit = {}
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray50)
-            .padding(paddingValues)
-    ) {
-        item {
-            AppHeader(
-                title = "Smart Keuneunong",
-                subtitle = DateUtils.getCurrentDateFormatted(),
-                showGreeting = true,
-                onMenuClick = openDrawer
-            )
-        }
+    // Simulasi state loading dan error (bisa diganti dengan state asli jika ada)
+    val isLoading = false
+    val isError = false
+    val errorMessage = "Gagal memuat notifikasi."
 
-        if (sampleNotifications.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Tidak ada notifikasi baru.",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Gray500
+    when {
+        isLoading -> LoadingState(modifier = Modifier.padding(paddingValues))
+        isError -> ErrorState(message = errorMessage, modifier = Modifier.padding(paddingValues))
+        else -> {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Gray50)
+                    .padding(paddingValues)
+            ) {
+                item {
+                    AppHeader(
+                        title = "Smart Keuneunong",
+                        subtitle = DateUtils.getCurrentDateFormatted(),
+                        showGreeting = true,
+                        onMenuClick = openDrawer
                     )
                 }
-            }
-        } else {
-            items(sampleNotifications) { notification ->
-                NotificationItem(notification = notification)
+
+                if (sampleNotifications.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Tidak ada notifikasi baru.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Gray500
+                            )
+                        }
+                    }
+                } else {
+                    items(sampleNotifications) { notification ->
+                        NotificationItem(notification = notification)
+                    }
+                }
             }
         }
     }
