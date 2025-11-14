@@ -48,165 +48,179 @@ fun WeatherScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-            // 1. Ringkasan Cuaca Saat Ini
-            Column(
+        // 1. Ringkasan Cuaca Saat Ini (refactored)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp, horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Weather Icon (Left, smaller)
+            Text(
+                text = "🌤️",
+                fontSize = 40.sp,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 24.dp, horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .weight(0.13f)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            // Temperature (Center, lebih besar space)
+            Text(
+                text = "29°C",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                color = Gray900,
+                modifier = Modifier
+                    .padding(end = 8.dp)
+                    .weight(0.37f)
+            )
+            // Location and Weather Info (Right, sedikit lebih kecil)
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.weight(0.5f)
             ) {
                 Text(
                     text = locationDisplay,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray700
-                )
-                // Ikon cuaca besar
-                Text(
-                    text = "🌤️", // Anda bisa ganti dengan Image/Icon
-                    fontSize = 80.sp
-                )
-                Text(
-                    text = "29°C",
-                    style = MaterialTheme.typography.displayLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Gray900
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Gray700,
+                    maxLines = 1
                 )
                 Text(
                     text = "Cerah Berawan",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Gray500
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Gray500,
+                    maxLines = 2
                 )
             }
-
-            // 2. Konteks Keuneunong
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)) // Biru muda
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Konteks Keuneunong",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Saat ini: Keuneunong Ròt (Musim Tanam)",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = Gray700
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Cuaca cerah berawan sangat baik untuk memulai pengolahan sawah dan penanaman padi. Waspadai hujan singkat di sore hari.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray700
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 3. Detail Hari Ini
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Detail Hari Ini",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    // Grid 2x2 untuk detail
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        WeatherDetailItem(
-                            icon = Icons.Default.Air,
-                            label = "Angin",
-                            value = "14 km/j"
-                        )
-                        WeatherDetailItem(
-                            icon = Icons.Default.WaterDrop,
-                            label = "Kelembapan",
-                            value = "72%"
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        WeatherDetailItem(
-                            icon = Icons.Default.WbSunny,
-                            label = "Terbit",
-                            value = "06:18"
-                        )
-                        WeatherDetailItem(
-                            icon = Icons.Default.Brightness4,
-                            label = "Terbenam",
-                            value = "18:45"
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 4. Prakiraan Laut
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Prakiraan Laut",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        WeatherDetailItem(
-                            icon = Icons.Default.Waves,
-                            label = "Tinggi Gelombang",
-                            value = "0.5 - 1.2 m"
-                        )
-                        WeatherDetailItem(
-                            icon = Icons.Default.WindPower,
-                            label = "Angin di Laut",
-                            value = "18 km/j (Barat)"
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Kondisi laut cukup tenang, aman untuk aktivitas melaut. Tetap waspada terhadap perubahan cuaca tiba-tiba.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Gray700
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
         }
+
+        // 2. Konteks Keuneunong
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)) // Biru muda
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Konteks Keuneunong",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Gray900
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Saat ini: Keuneunong Ròt (Musim Tanam)",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = Gray700
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Cuaca cerah berawan sangat baik untuk memulai pengolahan sawah dan penanaman padi. Waspadai hujan singkat di sore hari.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray700
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 3. Detail Hari Ini
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Detail Hari Ini",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Gray900,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                // Grid 2x2 untuk detail
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    WeatherDetailItem(
+                        icon = Icons.Default.Air,
+                        label = "Angin",
+                        value = "14 km/j"
+                    )
+                    WeatherDetailItem(
+                        icon = Icons.Default.WaterDrop,
+                        label = "Kelembapan",
+                        value = "72%"
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    WeatherDetailItem(
+                        icon = Icons.Default.WbSunny,
+                        label = "Terbit",
+                        value = "06:18"
+                    )
+                    WeatherDetailItem(
+                        icon = Icons.Default.Brightness4,
+                        label = "Terbenam",
+                        value = "18:45"
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 4. Prakiraan Laut
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Prakiraan Laut",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Gray900,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    WeatherDetailItem(
+                        icon = Icons.Default.Waves,
+                        label = "Tinggi Gelombang",
+                        value = "0.5 - 1.2 m"
+                    )
+                    WeatherDetailItem(
+                        icon = Icons.Default.WindPower,
+                        label = "Angin di Laut",
+                        value = "18 km/j (Barat)"
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Kondisi laut cukup tenang, aman untuk aktivitas melaut. Tetap waspada terhadap perubahan cuaca tiba-tiba.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Gray700
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
+}
 
 @Composable
 fun WeatherDetailItem(icon: ImageVector, label: String, value: String) {
