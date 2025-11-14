@@ -12,89 +12,89 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smart.keuneunong.ui.theme.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun RecommendationScreen() {
+fun RecommendationScreen(
+    viewModel: RecommendationViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray50)
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-
-        item {
-            Text(
-                text = "Rekomendasi Aktivitas",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                color = Gray900
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Berdasarkan Keuneunong Saat Ini",
-                style = MaterialTheme.typography.titleMedium,
-                color = Gray500
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+    when (uiState) {
+        is RecommendationUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
-
-        item {
-            CurrentKeuneunongCard(
-                periodName = "Keuneunong Ke-7 (Tujuh)",
-                description = "Masa 'Angen Barat' (Angin Barat) dimulai. Curah hujan sedang hingga tinggi dan angin cenderung kencang."
-            )
+        is RecommendationUiState.Error -> {
+            val message = (uiState as RecommendationUiState.Error).message
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = message, color = MaterialTheme.colorScheme.error)
+            }
         }
+        is RecommendationUiState.Success -> {
+            val data = uiState as RecommendationUiState.Success
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Gray50)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
 
-        // 3. Judul Bagian Rekomendasi
-        item {
-            Text(
-                text = "Rekomendasi Sektor",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth(), // Rata kiri
-                fontWeight = FontWeight.Bold,
-                color = Gray900
-            )
-        }
+                item {
+                    Text(
+                        text = "Rekomendasi Aktivitas",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Gray900
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Berdasarkan Keuneunong Saat Ini",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Gray500
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-        item {
-            RecommendationCard(
-                title = "Pertanian",
-                icon = "🌾",
-                recommendations = listOf(
-                    "Waktu ideal untuk memulai penanaman padi sawah.",
-                    "Periksa saluran irigasi untuk memastikan ketersediaan air.",
-                    "Perbanyak pemupukan karena nutrisi mungkin terbawa air hujan."
-                ),
-                notes = "Waspada hama wereng dan busuk akar akibat kelembaban tinggi."
-            )
-        }
+                item {
+                    CurrentKeuneunongCard(
+                        periodName = data.periodName,
+                        description = data.periodDescription
+                    )
+                }
 
-        item {
-            RecommendationCard(
-                title = "Melaut & Perikanan",
-                icon = "🌊",
-                recommendations = listOf(
-                    "Musim ikan tongkol dan cumi-cumi di perairan dangkal.",
-                    "Waktu yang baik untuk memperbaiki jaring dan alat tangkap."
-                ),
-                notes = "Angin Barat sedang kencang. Ombak bisa mencapai 2-3 meter. Nelayan kecil disarankan tidak melaut jauh."
-            )
-        }
+                item {
+                    Text(
+                        text = "Rekomendasi Sektor",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.fillMaxWidth(),
+                        fontWeight = FontWeight.Bold,
+                        color = Gray900
+                    )
+                }
 
-        item {
-            RecommendationCard(
-                title = "Aktivitas Lain",
-                icon = "🏠",
-                recommendations = listOf(
-                    "Waktu yang baik untuk memperbaiki atap rumah sebelum puncak musim hujan.",
-                    "Jaga kesehatan karena masuk musim pancaroba."
-                ),
-                notes = null // Tidak ada catatan khusus
-            )
+                items(data.sectorRecommendations.size) { idx ->
+                    val sector = data.sectorRecommendations[idx]
+                    RecommendationCard(
+                        title = sector.title,
+                        icon = sector.icon,
+                        recommendations = sector.recommendations,
+                        notes = sector.notes
+                    )
+                }
+            }
         }
     }
 }
