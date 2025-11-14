@@ -16,14 +16,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smart.keuneunong.ui.components.AppHeader
+import com.smart.keuneunong.ui.location.LocationState
 import com.smart.keuneunong.ui.theme.*
 import com.smart.keuneunong.utils.DateUtils
 
 @Composable
 fun WeatherScreen(
     paddingValues: PaddingValues = PaddingValues(),
-    openDrawer: () -> Unit = {}
+    openDrawer: () -> Unit = {},
+    locationState: LocationState,
+    getLocationName: (Double, Double) -> String
 ) {
+    val locationDisplay = when (locationState) {
+        is LocationState.Success -> getLocationName(locationState.latitude, locationState.longitude)
+        else -> "Lhokseumawe"
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +57,7 @@ fun WeatherScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Banda Aceh",
+                    text = locationDisplay,
                     style = MaterialTheme.typography.headlineSmall,
                     color = Gray700
                 )

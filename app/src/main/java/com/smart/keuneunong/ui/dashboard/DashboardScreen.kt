@@ -86,8 +86,8 @@ fun DashboardScreen(
         }
     ) { innerPadding, openDrawer ->
         when (selectedTab) {
-            0 -> DashboardContent(uiState, locationState, viewModel, innerPadding, openDrawer)
-            1 -> WeatherScreen(innerPadding, openDrawer)
+            0 -> DashboardContent(uiState, locationState, viewModel, innerPadding, openDrawer, locationViewModel)
+            1 -> WeatherScreen(innerPadding, openDrawer, locationState, locationViewModel::getLocationName)
             2 -> RecommendationScreen(innerPadding, openDrawer)
             3 -> NotificationScreen(innerPadding, openDrawer)
         }
@@ -100,13 +100,14 @@ fun DashboardContent(
     locationState: com.smart.keuneunong.ui.location.LocationState,
     viewModel: DashboardViewModel,
     contentPadding: PaddingValues,
-    onMenuClick: () -> Unit
+    onMenuClick: () -> Unit,
+    locationViewModel: LocationViewModel
 ) {
 
     // Get location display name
     val locationDisplay = when (locationState) {
         is com.smart.keuneunong.ui.location.LocationState.Success -> {
-            getLocationName(locationState.latitude, locationState.longitude)
+            locationViewModel.getLocationName(locationState.latitude, locationState.longitude)
         }
         else -> "Lhokseumawe" // Default location (5.1801, 97.1507)
     }
@@ -238,13 +239,13 @@ fun BottomNavigationBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.TipsAndUpdates,
-                    contentDescription = "Rekomendasi",
+                    contentDescription = "Saran",
                     tint = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5)
                 )
             },
             label = {
                 Text(
-                    text = "Rekomendasi",
+                    text = "Saran",
                     color = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5),
                     fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal
                 )
@@ -352,50 +353,4 @@ fun FaseInfoRow(icon: String, title: String, date: String, description: String) 
             )
         }
     }
-}
-
-
-/**
- * Get location name based on coordinates
- * Maps coordinates to known cities in Aceh or returns generic "Aceh"
- */
-private fun getLocationName(latitude: Double, longitude: Double): String {
-    val acehnesseCities = listOf(
-        // Format: Triple(lat, lng, nama kota)
-        Triple(5.5577, 95.3222, "Banda Aceh"),
-        Triple(5.1801, 97.1507, "Lhokseumawe"),
-        Triple(5.0915, 97.3174, "Langsa"),
-        Triple(4.1721, 96.2524, "Meulaboh"),
-        Triple(3.9670, 97.0253, "Tapaktuan"),
-        Triple(4.3726, 97.7925, "Singkil"),
-        Triple(5.5291, 96.9490, "Bireuen"),
-        Triple(4.5159, 96.4167, "Calang"),
-        Triple(5.1895, 96.7446, "Sigli"),
-        Triple(4.9637, 97.6274, "Idi"),
-        Triple(5.3090, 96.8097, "Lhoksukon"),
-        Triple(4.6951, 96.2493, "Jantho"),
-        Triple(4.3588, 97.1953, "Blangkejeren"),
-        Triple(4.0329, 96.8157, "Kutacane"),
-        Triple(5.0260, 97.4012, "Kuala Simpang"),
-        Triple(4.8401, 97.1534, "Takengon"),
-        Triple(5.2491, 96.5039, "Lhoknga"),
-        Triple(5.4560, 95.6203, "Sabang")
-    )
-
-    // Toleransi jarak dalam derajat (sekitar 5-10 km)
-    val tolerance = 0.1
-
-    // Cari kota terdekat
-    for ((cityLat, cityLng, cityName) in acehnesseCities) {
-        val latDiff = kotlin.math.abs(latitude - cityLat)
-        val lngDiff = kotlin.math.abs(longitude - cityLng)
-
-        // Jika koordinat dekat dengan salah satu kota
-        if (latDiff <= tolerance && lngDiff <= tolerance) {
-            return cityName
-        }
-    }
-
-    // Default "Aceh"
-    return "Aceh"
 }
