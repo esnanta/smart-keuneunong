@@ -169,7 +169,7 @@ fun DashboardContent(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp) // Memberi jarak antar baris
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
                     Row(
