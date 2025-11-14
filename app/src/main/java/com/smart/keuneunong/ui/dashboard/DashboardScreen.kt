@@ -122,7 +122,7 @@ fun DashboardContent(
         item {
             AppHeader(
                 title = "Smart Keuneunong",
-                subtitle = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
+                subtitle = viewModel.getFormattedToday(),
                 showGreeting = true,
                 onMenuClick = onMenuClick
             )

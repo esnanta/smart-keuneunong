@@ -107,4 +107,9 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
             else -> "Unknown"
         }
     }
+
+    fun getFormattedToday(): String {
+        val today = _uiState.value.today
+        return "${today.first} ${getMonthName(today.second)} ${today.third}"
+    }
 }
