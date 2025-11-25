@@ -15,12 +15,29 @@ import com.smart.keuneunong.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.smart.keuneunong.ui.components.DashboardHeader
+import java.util.Calendar
 
 @Composable
 fun RecommendationScreen(
-    viewModel: RecommendationViewModel = hiltViewModel()
+    viewModel: RecommendationViewModel = hiltViewModel(),
+    onMenuClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    // Mendapatkan tanggal hari ini
+    val calendar = Calendar.getInstance()
+    val today = Triple(
+        calendar.get(Calendar.DAY_OF_MONTH),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.YEAR)
+    )
+    val monthNames = listOf(
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    )
+    val getMonthName: (Int) -> String = { month ->
+        monthNames.getOrElse(month - 1) { "" }
+    }
 
     when (uiState) {
         is RecommendationUiState.Loading -> {
@@ -42,57 +59,65 @@ fun RecommendationScreen(
         }
         is RecommendationUiState.Success -> {
             val data = uiState as RecommendationUiState.Success
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Gray50)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                DashboardHeader(
+                    currentDate = today,
+                    getMonthName = getMonthName,
+                    onMenuClick = onMenuClick
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Gray50)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(bottom = 16.dp)
+                ) {
 
-                item {
-                    Text(
-                        text = "Rekomendasi Aktivitas",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Berdasarkan Keuneunong Saat Ini",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Gray500
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                    item {
+                        Text(
+                            text = "Rekomendasi Aktivitas",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Gray900
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Berdasarkan Keuneunong Saat Ini",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Gray500
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
-                item {
-                    CurrentKeuneunongCard(
-                        periodName = data.periodName,
-                        description = data.periodDescription
-                    )
-                }
+                    item {
+                        CurrentKeuneunongCard(
+                            periodName = data.periodName,
+                            description = data.periodDescription
+                        )
+                    }
 
-                item {
-                    Text(
-                        text = "Rekomendasi Sektor",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontWeight = FontWeight.Bold,
-                        color = Gray900
-                    )
-                }
+                    item {
+                        Text(
+                            text = "Rekomendasi Sektor",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontWeight = FontWeight.Bold,
+                            color = Gray900
+                        )
+                    }
 
-                items(data.sectorRecommendations.size) { idx ->
-                    val sector = data.sectorRecommendations[idx]
-                    RecommendationCard(
-                        title = sector.title,
-                        icon = sector.icon,
-                        recommendations = sector.recommendations,
-                        notes = sector.notes
-                    )
+                    items(data.sectorRecommendations.size) { idx ->
+                        val sector = data.sectorRecommendations[idx]
+                        RecommendationCard(
+                            title = sector.title,
+                            icon = sector.icon,
+                            recommendations = sector.recommendations,
+                            notes = sector.notes
+                        )
+                    }
                 }
             }
         }

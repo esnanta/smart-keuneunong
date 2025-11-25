@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.smart.keuneunong.ui.components.DashboardHeader
 import com.smart.keuneunong.ui.theme.*
+import java.util.Calendar
 
 
 data class NotificationData(
@@ -65,12 +67,32 @@ val sampleNotifications = listOf(
 )
 
 @Composable
-fun NotificationScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray50) // Latar belakang dari file asli
-    ) {
+fun NotificationScreen(
+    modifier: Modifier = Modifier,
+    onMenuClick: () -> Unit = {}
+) {
+    // Mendapatkan tanggal hari ini
+    val calendar = Calendar.getInstance()
+    val today = Triple(
+        calendar.get(Calendar.DAY_OF_MONTH),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.YEAR)
+    )
+    val monthNames = listOf(
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    )
+    val getMonthName: (Int) -> String = { month ->
+        monthNames.getOrElse(month - 1) { "" }
+    }
+
+    Column(modifier = modifier.fillMaxSize()) {
+        DashboardHeader(
+            currentDate = today,
+            getMonthName = getMonthName,
+            onMenuClick = onMenuClick
+        )
+        Spacer(modifier = Modifier.height(16.dp))
         // Judul Halaman
         Text(
             text = "Notifikasi",

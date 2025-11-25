@@ -15,16 +15,41 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smart.keuneunong.ui.components.DashboardHeader
 import com.smart.keuneunong.ui.theme.*
+import java.util.Calendar
 
 @Composable
-fun WeatherScreen() {
+fun WeatherScreen(
+    onMenuClick: () -> Unit = {}
+) {
+    val calendar = Calendar.getInstance()
+    val today = Triple(
+        calendar.get(Calendar.DAY_OF_MONTH),
+        calendar.get(Calendar.MONTH) + 1,
+        calendar.get(Calendar.YEAR)
+    )
+    val monthNames = listOf(
+        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    )
+    val getMonthName: (Int) -> String = { month ->
+        monthNames.getOrElse(month - 1) { "" }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50) // Latar belakang dari file asli
-            .verticalScroll(rememberScrollState()) // Tambahkan scroll
+            .background(Gray50)
+            .verticalScroll(rememberScrollState())
     ) {
+        DashboardHeader(
+            currentDate = today,
+            getMonthName = getMonthName,
+            onMenuClick = onMenuClick
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Judul Halaman
         Text(
             text = "Prakiraan Cuaca",
