@@ -1,10 +1,10 @@
-package com.smart.keuneunong.repository
+package com.smart.keuneunong.domain.repository
 
 import com.smart.keuneunong.data.database.AppDatabase
 import com.smart.keuneunong.data.database.asDomainModel
-import com.smart.keuneunong.domain.Details
-import com.smart.keuneunong.network.DetailsApi
-import com.smart.keuneunong.network.model.asDatabaseModel
+import com.smart.keuneunong.domain.UserDetails
+import com.smart.keuneunong.data.network.DetailsApi
+import com.smart.keuneunong.data.network.model.asDatabaseModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -15,7 +15,7 @@ class DetailsRepository @Inject constructor(
     private val appDatabase: AppDatabase
 ) {
 
-    fun getUserDetails(user: String): Flow<Details?> =
+    fun getUserDetails(user: String): Flow<UserDetails?> =
         appDatabase.usersDao.getDetails(user).map { it?.asDomainModel() }
 
     suspend fun refreshDetails(user: String) {

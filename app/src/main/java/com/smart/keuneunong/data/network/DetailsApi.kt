@@ -1,6 +1,6 @@
-package com.smart.keuneunong.network
+package com.smart.keuneunong.data.network
 
-import com.smart.keuneunong.network.model.DetailsApiModel
+import com.smart.keuneunong.data.network.model.DetailsApiModel
 import retrofit2.http.GET
 import retrofit2.http.Path
 

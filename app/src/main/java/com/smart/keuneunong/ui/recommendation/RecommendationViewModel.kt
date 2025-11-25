@@ -2,7 +2,7 @@ package com.smart.keuneunong.ui.recommendation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smart.keuneunong.repository.RecommendationRepository
+import com.smart.keuneunong.domain.repository.RecommendationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

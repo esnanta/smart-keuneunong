@@ -2,7 +2,7 @@ package com.smart.keuneunong.data.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.smart.keuneunong.domain.Details
+import com.smart.keuneunong.domain.UserDetails
 
 @Entity
 data class DetailsEntity constructor(
@@ -14,8 +14,8 @@ data class DetailsEntity constructor(
     val location: String
 )
 
-fun DetailsEntity.asDomainModel(): Details {
-    return Details(
+fun DetailsEntity.asDomainModel(): UserDetails {
+    return UserDetails(
         user = user,
         avatar = avatar,
         name = name,

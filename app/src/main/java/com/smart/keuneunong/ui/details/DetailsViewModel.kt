@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smart.keuneunong.repository.DetailsRepository
+import com.smart.keuneunong.domain.repository.DetailsRepository
 import com.smart.keuneunong.ui.Argument
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

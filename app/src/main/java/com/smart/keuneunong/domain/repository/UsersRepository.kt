@@ -1,10 +1,10 @@
-package com.smart.keuneunong.repository
+package com.smart.keuneunong.domain.repository
 
 import com.smart.keuneunong.data.database.AppDatabase
 import com.smart.keuneunong.data.database.asDomainModel
 import com.smart.keuneunong.domain.User
-import com.smart.keuneunong.network.UsersApi
-import com.smart.keuneunong.network.model.asDatabaseModel
+import com.smart.keuneunong.data.network.UsersApi
+import com.smart.keuneunong.data.network.model.asDatabaseModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
