@@ -5,7 +5,7 @@ import retrofit2.http.GET
 
 interface WeatherApi {
 
-    @GET("DataMKG/MEWS/DigitalForecast/DigitalForecast-JawaTimur.xml")
+    @GET("DataMKG/MEWS/DigitalForecast/DigitalForecast-Aceh.xml")
     suspend fun getWeather(): WeatherData
 }
 
