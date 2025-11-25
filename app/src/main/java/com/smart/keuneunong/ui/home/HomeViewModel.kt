@@ -2,8 +2,6 @@ package com.smart.keuneunong.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smart.keuneunong.data.model.CalendarDayData
-import com.smart.keuneunong.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,10 +9,12 @@ import com.smart.keuneunong.domain.repository.CalendarRepository
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.smart.keuneunong.domain.repository.RepositoryKeuneunong
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val calendarRepository: CalendarRepository
+    private val calendarRepository: CalendarRepository,
+    val repositoryKeuneunong: RepositoryKeuneunong
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()

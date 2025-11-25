@@ -31,12 +31,15 @@ import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
 import com.smart.keuneunong.ui.location.LocationViewModel
+import com.smart.keuneunong.domain.repository.RepositoryKeuneunong
 
 @Composable
 fun HomeScreen(
     locationViewModel: LocationViewModel = hiltViewModel()
 ) {
     var selectedTab by remember { mutableStateOf(0) }
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val repositoryKeuneunong = homeViewModel.repositoryKeuneunong
 
     ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName ->
         Scaffold(
@@ -51,8 +54,9 @@ fun HomeScreen(
             Box(modifier = Modifier.padding(scaffoldPadding)) {
                 when (selectedTab) {
                     0 -> HomeContent(
-                        viewModel = hiltViewModel(),
+                        viewModel = homeViewModel,
                         locationViewModel = locationViewModel,
+                        repositoryKeuneunong = repositoryKeuneunong,
                         contentPadding = innerPadding
                     )
                     1 -> WeatherScreen(contentPadding = innerPadding)
@@ -68,6 +72,7 @@ fun HomeScreen(
 fun HomeContent(
     viewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
+    repositoryKeuneunong: RepositoryKeuneunong,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
 ) {
@@ -135,7 +140,7 @@ fun HomeContent(
         /** ---------- FASE KEUNEUNONG ---------- **/
         item {
             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                FaseKeuneunongCard()
+                KeuneunongPhaseCard(phases = repositoryKeuneunong.getPhases())
             }
         }
 
@@ -233,7 +238,7 @@ fun BottomNavigationBar(
 }
 
 @Composable
-fun FaseKeuneunongCard() {
+fun KeuneunongPhaseCard(phases: List<com.smart.keuneunong.data.model.KeuneunongPhase>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -251,29 +256,15 @@ fun FaseKeuneunongCard() {
                 color = Color(0xFF222B45)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            // Musim Tanam
-            FaseInfoRow(
-                icon = "\uD83C\uDF31", // 🌱
-                title = "Musim Tanam",
-                date = "8 November",
-                description = "Waktu penanaman padi dan palawija"
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            // Musim Hujan
-            FaseInfoRow(
-                icon = "\uD83C\uDF27\uFE0F", // 🌧️
-                title = "Musim Hujan",
-                date = "15 November",
-                description = "Curah hujan meningkat"
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            // Waktu Melaut
-            FaseInfoRow(
-                icon = "\uD83C\uDF0A", // 🌊
-                title = "Waktu Melaut",
-                date = "22 November",
-                description = "Kondisi laut aman untuk nelayan"
-            )
+            phases.forEach { phase ->
+                FaseInfoRow(
+                    icon = phase.icon,
+                    title = phase.name,
+                    date = "${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.startDate))} - ${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.endDate))}",
+                    description = phase.description + if (phase.activities.isNotEmpty()) "\nAktivitas: ${phase.activities.joinToString(", ")}" else ""
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
     }
 }
