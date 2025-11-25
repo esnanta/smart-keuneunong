@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import java.util.Calendar
 
 @Composable
-fun DashboardHeader(
+fun ScreenHeader(
     currentDate: Triple<Int, Int, Int>, // day, month, year
     getMonthName: (Int) -> String,
     onMenuClick: () -> Unit,

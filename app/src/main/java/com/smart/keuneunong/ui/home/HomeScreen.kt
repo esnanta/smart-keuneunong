@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
-import com.smart.keuneunong.ui.components.DashboardHeader
+import com.smart.keuneunong.ui.components.ScreenHeader
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
@@ -140,7 +140,7 @@ fun DashboardContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            DashboardHeader(
+            ScreenHeader(
                 currentDate = uiState.today,
                 getMonthName = viewModel::getMonthName,
                 onMenuClick = onMenuClick

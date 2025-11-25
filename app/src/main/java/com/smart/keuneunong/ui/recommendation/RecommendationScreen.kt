@@ -15,7 +15,7 @@ import com.smart.keuneunong.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.smart.keuneunong.ui.components.DashboardHeader
+import com.smart.keuneunong.ui.components.ScreenHeader
 import java.util.Calendar
 
 @Composable
@@ -60,7 +60,7 @@ fun RecommendationScreen(
         is RecommendationUiState.Success -> {
             val data = uiState as RecommendationUiState.Success
             Column(modifier = Modifier.fillMaxSize()) {
-                DashboardHeader(
+                ScreenHeader(
                     currentDate = today,
                     getMonthName = getMonthName,
                     onMenuClick = onMenuClick

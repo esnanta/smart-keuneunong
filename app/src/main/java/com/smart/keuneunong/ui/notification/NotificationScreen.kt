@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.smart.keuneunong.ui.components.DashboardHeader
+import com.smart.keuneunong.ui.components.ScreenHeader
 import com.smart.keuneunong.ui.theme.*
 import java.util.Calendar
 
@@ -87,7 +87,7 @@ fun NotificationScreen(
     }
 
     Column(modifier = modifier.fillMaxSize()) {
-        DashboardHeader(
+        ScreenHeader(
             currentDate = today,
             getMonthName = getMonthName,
             onMenuClick = onMenuClick
