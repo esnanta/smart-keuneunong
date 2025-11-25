@@ -1,4 +1,4 @@
-package com.smart.keuneunong.ui.dashboard
+package com.smart.keuneunong.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -39,7 +39,7 @@ import com.smart.keuneunong.ui.components.NavigationDrawer
 
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     locationViewModel: LocationViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
@@ -117,9 +117,9 @@ fun DashboardScreen(
 
 @Composable
 fun DashboardContent(
-    uiState: DashboardUiState,
+    uiState: HomeUiState,
     locationState: com.smart.keuneunong.ui.location.LocationState,
-    viewModel: DashboardViewModel,
+    viewModel: HomeViewModel,
     contentPadding: PaddingValues,
     onMenuClick: () -> Unit
 ) {

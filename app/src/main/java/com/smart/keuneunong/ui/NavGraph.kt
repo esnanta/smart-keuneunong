@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.smart.keuneunong.ui.splash.SplashScreen
 import com.smart.keuneunong.ui.splash.SplashViewModel
-import com.smart.keuneunong.ui.dashboard.DashboardScreen
+import com.smart.keuneunong.ui.home.DashboardScreen
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")
