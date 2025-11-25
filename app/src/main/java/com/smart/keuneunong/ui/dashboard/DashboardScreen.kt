@@ -19,16 +19,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
+import com.smart.keuneunong.ui.components.DashboardHeader
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.rememberCoroutineScope
 import com.smart.keuneunong.ui.components.QuickStatCard
 import kotlinx.coroutines.launch
@@ -131,14 +130,6 @@ fun DashboardContent(
     contentPadding: PaddingValues,
     onMenuClick: () -> Unit
 ) {
-    val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-    val greeting = when (currentHour) {
-        in 5..11 -> "Selamat Pagi ☀️"
-        in 12..15 -> "Selamat Siang 🌤️"
-        in 16..18 -> "Selamat Sore 🌇"
-        else -> "Selamat Malam 🌙"
-    }
-
     // Get location display name
     val locationDisplay = when (locationState) {
         is com.smart.keuneunong.ui.location.LocationState.Success -> {
@@ -156,75 +147,11 @@ fun DashboardContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFF5B8DEF), Color(0xFF4E65D9))
-                        ),
-                        shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
-                    )
-                    .padding(horizontal = 20.dp, vertical = 24.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = greeting,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color(0xFFE3F2FD),
-                            fontWeight = FontWeight.Medium
-                        )
-
-                        IconButton(
-                            onClick = onMenuClick,
-                            modifier = Modifier
-                                .size(20.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                tint = Color.White
-                            )
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Column {
-                            Text(
-                                text = "Smart Keuneunong",
-                                style = MaterialTheme.typography.headlineSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = "${uiState.today.first} ${viewModel.getMonthName(uiState.today.second)} ${uiState.today.third}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFFBBDEFB)
-                            )
-                        }
-
-                        Icon(
-                            imageVector = Icons.Default.Cloud,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.size(28.dp)
-                        )
-                    }
-                }
-            }
+            DashboardHeader(
+                currentDate = uiState.today,
+                getMonthName = viewModel::getMonthName,
+                onMenuClick = onMenuClick
+            )
         }
 
         /** ---------- QUICK INFO CARDS ---------- **/
