@@ -463,7 +463,7 @@ fun SplashScreen(
 ### DashboardScreen.kt
 
 ```kotlin
-// ui/screens/dashboard/DashboardScreen.kt
+// ui/screens/dashboard/HomeScreen.kt
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
