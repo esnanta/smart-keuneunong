@@ -50,7 +50,7 @@ fun HomeScreen(
         ) { scaffoldPadding ->
             Box(modifier = Modifier.padding(scaffoldPadding)) {
                 when (selectedTab) {
-                    0 -> DashboardContent(
+                    0 -> HomeContent(
                         viewModel = hiltViewModel(),
                         locationViewModel = locationViewModel,
                         contentPadding = innerPadding
@@ -65,7 +65,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun DashboardContent(
+fun HomeContent(
     viewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
     modifier: Modifier = Modifier,
