@@ -145,6 +145,14 @@ fun CalendarDayCell(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
+
+                Text(
+                    text = dayData.weatherEmoji,
+                    fontSize = 14.sp
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
                 // Day number with highlight for current day
                 Box(
                     modifier = Modifier
@@ -170,12 +178,6 @@ fun CalendarDayCell(
                 }
 
                 Spacer(modifier = Modifier.height(2.dp))
-
-                // Weather icon
-                Text(
-                    text = dayData.weatherEmoji,
-                    fontSize = 14.sp
-                )
 
                 // Special marker (checkmark for important days)
                 if (dayData.hasSpecialEvent) {
