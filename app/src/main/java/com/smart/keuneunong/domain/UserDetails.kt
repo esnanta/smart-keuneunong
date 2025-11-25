@@ -1,6 +1,6 @@
 package com.smart.keuneunong.domain
 
-data class Details(
+data class UserDetails(
     val user: String? = "",
     val avatar: String? = "",
     val name: String? = "",

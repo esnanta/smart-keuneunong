@@ -15,9 +15,12 @@ import com.smart.keuneunong.ui.theme.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.smart.keuneunong.ui.components.ScreenHeader
+import java.util.Calendar
 
 @Composable
 fun RecommendationScreen(
+    contentPadding: PaddingValues,
     viewModel: RecommendationViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -46,6 +49,7 @@ fun RecommendationScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Gray50)
+                    .padding(contentPadding)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -164,7 +168,7 @@ fun RecommendationCard(
 
 
             if (notes != null) {
-                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
                 RecommendationItem(text = notes, isRecommended = false)
             }
         }

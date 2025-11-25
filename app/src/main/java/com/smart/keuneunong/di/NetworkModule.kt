@@ -1,8 +1,8 @@
 package com.smart.keuneunong.di
 
 import com.smart.keuneunong.BuildConfig
-import com.smart.keuneunong.network.DetailsApi
-import com.smart.keuneunong.network.UsersApi
+import com.smart.keuneunong.data.network.DetailsApi
+import com.smart.keuneunong.data.network.UsersApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

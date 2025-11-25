@@ -1,4 +1,4 @@
-package com.smart.keuneunong.database
+package com.smart.keuneunong.data.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

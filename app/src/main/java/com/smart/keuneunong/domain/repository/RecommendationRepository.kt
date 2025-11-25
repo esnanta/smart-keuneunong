@@ -1,4 +1,4 @@
-package com.smart.keuneunong.repository
+package com.smart.keuneunong.domain.repository
 
 import com.smart.keuneunong.ui.recommendation.RecommendationUiState
 import com.smart.keuneunong.ui.recommendation.SectorRecommendation

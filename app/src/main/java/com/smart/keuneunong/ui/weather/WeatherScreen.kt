@@ -15,16 +15,23 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.smart.keuneunong.ui.components.ScreenHeader
 import com.smart.keuneunong.ui.theme.*
+import java.util.Calendar
 
 @Composable
-fun WeatherScreen() {
+fun WeatherScreen(
+    contentPadding: PaddingValues
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Gray50) // Latar belakang dari file asli
-            .verticalScroll(rememberScrollState()) // Tambahkan scroll
+            .background(Gray50)
+            .padding(contentPadding)
+            .verticalScroll(rememberScrollState())
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         // Judul Halaman
         Text(
             text = "Prakiraan Cuaca",
@@ -181,7 +188,7 @@ fun WeatherScreen() {
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Divider()
+                HorizontalDivider()
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Kondisi laut cukup tenang, aman untuk aktivitas melaut. Tetap waspada terhadap perubahan cuaca tiba-tiba.",

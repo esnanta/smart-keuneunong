@@ -2,8 +2,8 @@ package com.smart.keuneunong.di
 
 import android.content.Context
 import androidx.room.Room
-import com.smart.keuneunong.database.UsersDao
-import com.smart.keuneunong.database.AppDatabase
+import com.smart.keuneunong.data.database.UsersDao
+import com.smart.keuneunong.data.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

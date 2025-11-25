@@ -1,6 +1,6 @@
-package com.smart.keuneunong.network
+package com.smart.keuneunong.data.network
 
-import com.smart.keuneunong.network.model.UserApiModel
+import com.smart.keuneunong.data.network.model.UserApiModel
 import retrofit2.http.GET
 
 interface UsersApi {

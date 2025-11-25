@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.smart.keuneunong.ui.components.ScreenHeader
 import com.smart.keuneunong.ui.theme.*
+import java.util.Calendar
 
 
 data class NotificationData(
@@ -65,12 +67,16 @@ val sampleNotifications = listOf(
 )
 
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .background(Gray50) // Latar belakang dari file asli
+            .padding(contentPadding)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
         // Judul Halaman
         Text(
             text = "Notifikasi",

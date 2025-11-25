@@ -1,10 +1,10 @@
-package com.smart.keuneunong.ui.dashboard
+package com.smart.keuneunong.ui.home
 
 import com.smart.keuneunong.data.model.CalendarDayData
 
 // Represents the UI state for the Dashboard screen
 // Add more fields as needed for features, loading, error, etc.
-data class DashboardUiState(
+data class HomeUiState(
     val currentMonth: Int = 11,
     val currentYear: Int = 2025,
     val calendarDays: List<CalendarDayData> = emptyList(),
