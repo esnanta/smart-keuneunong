@@ -68,30 +68,14 @@ val sampleNotifications = listOf(
 
 @Composable
 fun NotificationScreen(
-    modifier: Modifier = Modifier,
-    onMenuClick: () -> Unit = {}
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
-    // Mendapatkan tanggal hari ini
-    val calendar = Calendar.getInstance()
-    val today = Triple(
-        calendar.get(Calendar.DAY_OF_MONTH),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.YEAR)
-    )
-    val monthNames = listOf(
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    )
-    val getMonthName: (Int) -> String = { month ->
-        monthNames.getOrElse(month - 1) { "" }
-    }
-
-    Column(modifier = modifier.fillMaxSize()) {
-        ScreenHeader(
-            currentDate = today,
-            getMonthName = getMonthName,
-            onMenuClick = onMenuClick
-        )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+    ) {
         Spacer(modifier = Modifier.height(16.dp))
         // Judul Halaman
         Text(

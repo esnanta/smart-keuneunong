@@ -32,8 +32,8 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationPickerScreen(
-    onLocationSelected: (LatLng) -> Unit,
-    onNavigateBack: () -> Unit,
+    locationViewModel: LocationViewModel,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -89,7 +89,7 @@ fun LocationPickerScreen(
             TopAppBar(
                 title = { Text("Pilih Lokasi") },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onDismiss) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Kembali")
                     }
                 },
@@ -109,7 +109,8 @@ fun LocationPickerScreen(
                     FloatingActionButton(
                         onClick = {
                             uiState.selectedLocation?.let { location ->
-                                onLocationSelected(location)
+                                locationViewModel.saveLocation(location.latitude, location.longitude)
+                                onDismiss()
                             }
                         },
                         containerColor = MaterialTheme.colorScheme.primary

@@ -16,24 +16,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun NavigationDrawer(
-    drawerState: DrawerState,
-    onLocationClick: () -> Unit,
-    onAboutClick: () -> Unit,
-    content: @Composable () -> Unit
+fun AppDrawer(
+    onShowLocationPicker: () -> Unit,
+    onShowAboutDialog: () -> Unit
 ) {
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                DrawerContent(
-                    onLocationClick = onLocationClick,
-                    onAboutClick = onAboutClick
-                )
-            }
-        },
-        content = content
-    )
+    ModalDrawerSheet {
+        DrawerContent(
+            onLocationClick = onShowLocationPicker,
+            onAboutClick = onShowAboutDialog
+        )
+    }
 }
 
 @Composable

@@ -21,33 +21,15 @@ import java.util.Calendar
 
 @Composable
 fun WeatherScreen(
-    onMenuClick: () -> Unit = {}
+    contentPadding: PaddingValues
 ) {
-    val calendar = Calendar.getInstance()
-    val today = Triple(
-        calendar.get(Calendar.DAY_OF_MONTH),
-        calendar.get(Calendar.MONTH) + 1,
-        calendar.get(Calendar.YEAR)
-    )
-    val monthNames = listOf(
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    )
-    val getMonthName: (Int) -> String = { month ->
-        monthNames.getOrElse(month - 1) { "" }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Gray50)
+            .padding(contentPadding)
             .verticalScroll(rememberScrollState())
     ) {
-        ScreenHeader(
-            currentDate = today,
-            getMonthName = getMonthName,
-            onMenuClick = onMenuClick
-        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Judul Halaman

@@ -19,69 +19,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
-import com.smart.keuneunong.ui.components.ScreenHeader
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TipsAndUpdates
-import androidx.compose.runtime.rememberCoroutineScope
 import com.smart.keuneunong.ui.components.QuickStatCard
-import kotlinx.coroutines.launch
+import com.smart.keuneunong.ui.components.ScreenWithHeaderAndDrawer
 import com.smart.keuneunong.ui.weather.WeatherScreen
 import com.smart.keuneunong.ui.recommendation.RecommendationScreen
 import com.smart.keuneunong.ui.notification.NotificationScreen
-import com.smart.keuneunong.ui.location.LocationPickerScreen
 import com.smart.keuneunong.ui.location.LocationViewModel
-import timber.log.Timber
-import com.smart.keuneunong.ui.components.NavigationDrawer
 
 @Composable
 fun DashboardScreen(
-    viewModel: HomeViewModel = hiltViewModel(),
     locationViewModel: LocationViewModel = hiltViewModel()
 ) {
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
-    val locationState = locationViewModel.selectedLocation.collectAsStateWithLifecycle().value
-    var selectedTab by remember { mutableStateOf<Int>(0) }
-    var showAboutDialog by remember { mutableStateOf(false) }
-    var showLocationPicker by remember { mutableStateOf(false) }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+    var selectedTab by remember { mutableStateOf(0) }
 
-    // About Dialog
-    if (showAboutDialog) {
-        AboutDialog(onDismiss = { showAboutDialog = false })
-    }
-
-    // Location Picker Screen
-    if (showLocationPicker) {
-        LocationPickerScreen(
-            onLocationSelected = { location ->
-                // Save location using ViewModel
-                locationViewModel.saveLocation(location.latitude, location.longitude)
-                Timber.d("Location saved: Lat=${location.latitude}, Lng=${location.longitude}")
-                showLocationPicker = false
-            },
-            onNavigateBack = {
-                showLocationPicker = false
-            }
-        )
-        return // Don't render the rest of the dashboard when showing location picker
-    }
-
-    NavigationDrawer(
-        drawerState = drawerState,
-        onLocationClick = {
-            scope.launch { drawerState.close() }
-            showLocationPicker = true
-        },
-        onAboutClick = {
-            scope.launch { drawerState.close() }
-            showAboutDialog = true
-        }
-    ) {
+    ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName ->
         Scaffold(
             contentWindowInsets = WindowInsets.systemBars,
             bottomBar = {
@@ -90,26 +47,18 @@ fun DashboardScreen(
                     onTabSelected = { selectedTab = it }
                 )
             }
-        ) { innerPadding ->
-            // Content based on selected tab
-            when (selectedTab) {
-                0 -> DashboardContent(uiState, locationState, viewModel, innerPadding) {
-                    scope.launch { drawerState.open() }
+        ) { scaffoldPadding ->
+            Box(modifier = Modifier.padding(scaffoldPadding)) {
+                when (selectedTab) {
+                    0 -> DashboardContent(
+                        viewModel = hiltViewModel(),
+                        locationViewModel = locationViewModel,
+                        contentPadding = innerPadding
+                    )
+                    1 -> WeatherScreen(contentPadding = innerPadding)
+                    2 -> RecommendationScreen(contentPadding = innerPadding)
+                    3 -> NotificationScreen(contentPadding = innerPadding)
                 }
-                1 -> Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)) { WeatherScreen() }
-                2 -> Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) { RecommendationScreen() }
-
-                3 -> Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) { NotificationScreen() }
             }
         }
     }
@@ -117,12 +66,13 @@ fun DashboardScreen(
 
 @Composable
 fun DashboardContent(
-    uiState: HomeUiState,
-    locationState: com.smart.keuneunong.ui.location.LocationState,
     viewModel: HomeViewModel,
-    contentPadding: PaddingValues,
-    onMenuClick: () -> Unit
+    locationViewModel: LocationViewModel,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues
 ) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
+    val locationState = locationViewModel.selectedLocation.collectAsStateWithLifecycle().value
     // Get location display name
     val locationDisplay = when (locationState) {
         is com.smart.keuneunong.ui.location.LocationState.Success -> {
@@ -139,14 +89,6 @@ fun DashboardContent(
         contentPadding = PaddingValues(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            ScreenHeader(
-                currentDate = uiState.today,
-                getMonthName = viewModel::getMonthName,
-                onMenuClick = onMenuClick
-            )
-        }
-
         /** ---------- QUICK INFO CARDS ---------- **/
         item {
             Row(
@@ -185,7 +127,11 @@ fun DashboardContent(
                     calendarDays = uiState.calendarDays,
                     onPreviousMonth = viewModel::onPreviousMonth,
                     onNextMonth = viewModel::onNextMonth,
-                    getMonthName = viewModel::getMonthName
+                    getMonthName = { month ->
+                        val calendar = java.util.Calendar.getInstance()
+                        calendar.set(java.util.Calendar.MONTH, month - 1)
+                        String.format("%tB", calendar)
+                    }
                 )
             }
         }
