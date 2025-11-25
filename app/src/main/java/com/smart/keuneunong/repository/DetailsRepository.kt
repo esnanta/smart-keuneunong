@@ -1,7 +1,7 @@
 package com.smart.keuneunong.repository
 
-import com.smart.keuneunong.database.AppDatabase
-import com.smart.keuneunong.database.asDomainModel
+import com.smart.keuneunong.data.database.AppDatabase
+import com.smart.keuneunong.data.database.asDomainModel
 import com.smart.keuneunong.domain.Details
 import com.smart.keuneunong.network.DetailsApi
 import com.smart.keuneunong.network.model.asDatabaseModel

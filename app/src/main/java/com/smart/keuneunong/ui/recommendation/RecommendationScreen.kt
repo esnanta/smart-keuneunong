@@ -164,7 +164,7 @@ fun RecommendationCard(
 
 
             if (notes != null) {
-                Divider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Gray100)
                 RecommendationItem(text = notes, isRecommended = false)
             }
         }

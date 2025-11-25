@@ -1,7 +1,7 @@
 package com.smart.keuneunong.network.model
 
 
-import com.smart.keuneunong.database.DetailsEntity
+import com.smart.keuneunong.data.database.DetailsEntity
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
