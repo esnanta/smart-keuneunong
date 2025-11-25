@@ -1,7 +1,7 @@
 package com.smart.keuneunong.di
 
 import com.smart.keuneunong.domain.repository.RepositoryKeuneunong
-import com.smart.keuneunong.data.repository.RepositoryKeuneunongImpl
+import com.smart.keuneunong.data.repository.KeuneunongRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,6 +13,6 @@ import javax.inject.Singleton
 object KeuneunongModule {
     @Provides
     @Singleton
-    fun provideRepositoryKeuneunong(): RepositoryKeuneunong = RepositoryKeuneunongImpl()
+    fun provideRepositoryKeuneunong(): RepositoryKeuneunong = KeuneunongRepositoryImpl()
 }
 

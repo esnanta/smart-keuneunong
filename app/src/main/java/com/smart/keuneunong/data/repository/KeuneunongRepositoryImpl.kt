@@ -4,7 +4,7 @@ import com.smart.keuneunong.data.model.KeuneunongPhase
 import com.smart.keuneunong.domain.repository.RepositoryKeuneunong
 import javax.inject.Inject
 
-class RepositoryKeuneunongImpl @Inject constructor(): RepositoryKeuneunong {
+class KeuneunongRepositoryImpl @Inject constructor(): RepositoryKeuneunong {
     override fun getPhases(): List<KeuneunongPhase> {
         // Example data, replace with actual logic
         return listOf(
