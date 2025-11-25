@@ -33,7 +33,7 @@ import com.smart.keuneunong.ui.notification.NotificationScreen
 import com.smart.keuneunong.ui.location.LocationViewModel
 
 @Composable
-fun DashboardScreen(
+fun HomeScreen(
     locationViewModel: LocationViewModel = hiltViewModel()
 ) {
     var selectedTab by remember { mutableStateOf(0) }
