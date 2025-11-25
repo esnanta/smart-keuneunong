@@ -15,21 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.smart.keuneunong.data.model.WeatherData
 import com.smart.keuneunong.ui.theme.Gray50
 import com.smart.keuneunong.ui.theme.Gray500
 import com.smart.keuneunong.ui.theme.Gray700
 import com.smart.keuneunong.ui.theme.Gray900
 import com.smart.keuneunong.ui.theme.SmartKeuneunongTheme
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import com.smart.keuneunong.ui.weather.WeatherUiState.Loading
-import com.smart.keuneunong.ui.weather.WeatherUiState.Success
-import com.smart.keuneunong.ui.weather.WeatherUiState.Error
 
 @Composable
 fun WeatherScreen(
@@ -56,26 +51,22 @@ fun WeatherScreen(
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp)
         )
 
-        when (val state = uiState) {
-            is Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-            is Success -> {
-                WeatherContent(state.weatherData)
+        } else if (uiState.error != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = uiState.error!!)
             }
-            is Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = state.message)
-                }
-            }
+        } else if (uiState.weatherData != null) {
+            WeatherContent(uiState.weatherData!!)
         }
     }
 }
@@ -113,69 +104,7 @@ fun WeatherContent(weatherData: WeatherData) {
         )
     }
 
-    // 2. Konteks Keuneunong
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)) // Biru muda
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Konteks Keuneunong",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = Gray900
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = weatherData.keuneunongContext,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = Gray700
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = weatherData.keuneunongDescription,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Gray700
-            )
-        }
-    }
-
-    // 3. Prakiraan Per Jam
-    Column(modifier = Modifier.padding(vertical = 24.dp)) {
-        Text(
-            text = "Prakiraan Per Jam",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(weatherData.hourlyForecast) { forecast ->
-                HourlyForecastItem(forecast)
-            }
-        }
-    }
-
-    // 4. Prakiraan 5 Hari
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-        Text(
-            text = "Prakiraan 5 Hari",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        weatherData.dailyForecast.forEach { forecast ->
-            DailyForecastItem(forecast)
-        }
-    }
-
-    // 5. Detail Cuaca
+    // 2. Detail Cuaca
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = "Detail Cuaca",
@@ -187,70 +116,19 @@ fun WeatherContent(weatherData: WeatherData) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            WeatherDetailItem(icon = Icons.Default.Air, label = "Angin", value = weatherData.wind)
-            WeatherDetailItem(icon = Icons.Default.WaterDrop, label = "Kelembapan", value = weatherData.humidity)
+            WeatherDetailItem(icon = Icons.Default.Air, label = "Angin", value = "${weatherData.windSpeed} km/j")
+            WeatherDetailItem(icon = Icons.Default.WaterDrop, label = "Kelembapan", value = "${weatherData.humidity}%")
         }
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            WeatherDetailItem(icon = Icons.Default.WbSunny, label = "Indeks UV", value = weatherData.uvIndex)
+            WeatherDetailItem(icon = Icons.Default.WbSunny, label = "Feels Like", value = "${weatherData.feelsLike}°C")
             WeatherDetailItem(
-                icon = Icons.Default.Compress,
-                label = "Tekanan",
-                value = weatherData.pressure
-            )
-        }
-    }
-}
-
-@Composable
-fun HourlyForecastItem(forecast: HourlyForecast) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(text = forecast.time, style = MaterialTheme.typography.bodySmall, color = Gray500)
-        Text(text = forecast.icon, fontSize = 24.sp)
-        Text(
-            text = "${forecast.temperature}°",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun DailyForecastItem(forecast: DailyForecast) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = forecast.day,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.weight(1f)
-        )
-        Text(text = forecast.icon, fontSize = 24.sp, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.End
-        ) {
-            Text(
-                text = "${forecast.tempMax}°",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "${forecast.tempMin}°",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Gray500
+                icon = Icons.Default.CalendarToday,
+                label = "Tanggal",
+                value = java.text.SimpleDateFormat("dd MMM yyyy").format(java.util.Date(weatherData.date))
             )
         }
     }

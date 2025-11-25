@@ -127,11 +127,7 @@ fun HomeContent(
                     calendarDays = uiState.calendarDays,
                     onPreviousMonth = viewModel::onPreviousMonth,
                     onNextMonth = viewModel::onNextMonth,
-                    getMonthName = { month ->
-                        val calendar = java.util.Calendar.getInstance()
-                        calendar.set(java.util.Calendar.MONTH, month - 1)
-                        String.format("%tB", calendar)
-                    }
+                    getMonthName = viewModel::getMonthName
                 )
             }
         }
