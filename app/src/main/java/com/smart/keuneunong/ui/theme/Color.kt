@@ -25,3 +25,9 @@ val Gray900 = Color(0xFF111827)
 
 val Cyan400 = Color(0xFF22D3EE)
 val Cyan500 = Color(0xFF06B6D4)
+
+// Rainfall Category Colors
+val RainfallHigh = Color(0xFF2D68C4)      // True Blue - Tinggi
+val RainfallMedium = Color(0xFFB5C7EB)    // Misty Blue - Sedang
+val RainfallLow = Color(0xFFFFDBBB)       // Light Orange - Rendah
+val RainfallVeryLow = Color(0xFFFF4B33)   // Red Orange - Sangat Rendah

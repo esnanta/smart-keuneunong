@@ -9,6 +9,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.smart.keuneunong.data.model.CalendarDayData
+import com.smart.keuneunong.domain.model.RainfallCategory
 import com.smart.keuneunong.ui.theme.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -104,6 +105,11 @@ fun CalendarComponent(
 
             // Calendar Grid
             CalendarGrid(calendarDays)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Rainfall Category Legend
+            RainfallLegend()
         }
     }
 }
@@ -177,6 +183,23 @@ fun CalendarDayCell(
                     )
                 }
 
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Rainfall category label (colored circle/strip)
+                if (dayData.rainfallCategory != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 24.dp, height = 6.dp)
+                            .background(
+                                color = getRainfallColor(dayData.rainfallCategory),
+                                shape = RoundedCornerShape(3.dp)
+                            )
+                    )
+                } else {
+                    // Placeholder to maintain spacing
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+
                 Spacer(modifier = Modifier.height(2.dp))
 
                 // Special marker (checkmark for important days)
@@ -187,9 +210,98 @@ fun CalendarDayCell(
                         tint = Green500,
                         modifier = Modifier.size(10.dp)
                     )
+                } else {
+                    // Placeholder to maintain spacing
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
+    }
+}
+
+/**
+ * Helper function untuk mendapatkan warna berdasarkan kategori curah hujan
+ */
+@Composable
+private fun getRainfallColor(category: RainfallCategory): Color {
+    return when (category) {
+        RainfallCategory.TINGGI -> RainfallHigh
+        RainfallCategory.SEDANG -> RainfallMedium
+        RainfallCategory.RENDAH -> RainfallLow
+        RainfallCategory.SANGAT_RENDAH -> RainfallVeryLow
+    }
+}
+
+/**
+ * Legend component untuk menampilkan kategori curah hujan
+ */
+@Composable
+fun RainfallLegend() {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = "Kategori Curah Hujan",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = Gray700,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            LegendItem(
+                color = RainfallHigh,
+                label = "Tinggi",
+                modifier = Modifier.weight(1f)
+            )
+            LegendItem(
+                color = RainfallMedium,
+                label = "Sedang",
+                modifier = Modifier.weight(1f)
+            )
+            LegendItem(
+                color = RainfallLow,
+                label = "Rendah",
+                modifier = Modifier.weight(1f)
+            )
+            LegendItem(
+                color = RainfallVeryLow,
+                label = "S. Rendah",
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+/**
+ * Single legend item component
+ */
+@Composable
+fun LegendItem(
+    color: Color,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(width = 16.dp, height = 6.dp)
+                .background(color, RoundedCornerShape(3.dp))
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = Gray500,
+            fontSize = 10.sp
+        )
     }
 }
 

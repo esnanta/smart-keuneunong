@@ -1,15 +1,20 @@
 package com.smart.keuneunong.data.repository
 
 import com.smart.keuneunong.data.model.CalendarDayData
+import com.smart.keuneunong.domain.model.RainfallHistory
 import com.smart.keuneunong.domain.repository.CalendarRepository
 import com.smart.keuneunong.utils.DateUtils
 import javax.inject.Inject
 
 class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
-    override fun getCalendarDays(month: Int, year: Int): List<CalendarDayData> {
+    override fun getCalendarDays(month: Int, year: Int, rainfallData: List<RainfallHistory>): List<CalendarDayData> {
         val days = mutableListOf<CalendarDayData>()
         val firstDayOfWeek = getFirstDayOfMonth(month, year)
         val daysInMonth = getDaysInMonth(month, year)
+
+        // Create rainfall map for quick lookup
+        val rainfallMap = rainfallData.associateBy { it.day }
+
         repeat(firstDayOfWeek) { days.add(CalendarDayData(day = 0)) }
         for (day in 1..daysInMonth) {
             val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
@@ -20,7 +25,9 @@ class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
                 else -> "☀️"
             }
             val hasSpecialEvent = day in listOf(15, 22)
-            days.add(CalendarDayData(day, today, weatherEmoji, hasSpecialEvent))
+            val rainfallCategory = rainfallMap[day]?.category
+
+            days.add(CalendarDayData(day, today, weatherEmoji, hasSpecialEvent, rainfallCategory))
         }
         val totalCells = days.size
         val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
