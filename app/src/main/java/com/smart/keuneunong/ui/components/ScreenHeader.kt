@@ -5,11 +5,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Thunderstorm
+import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +53,6 @@ fun ScreenHeader(
         in 16..18 -> "Selamat Sore"
         else -> "Selamat Malam"
     }
-    val greetingIcon = getWeatherIcon(weatherData?.condition)
 
     // Get location display using the same logic as HomeScreen
     val locationState = locationViewModel?.selectedLocation?.collectAsStateWithLifecycle()?.value
@@ -56,6 +62,8 @@ fun ScreenHeader(
         }
         else -> locationViewModel?.getCityName(5.1801, 97.1507) ?: weatherData?.location ?: ""
     }
+
+    val activityIcon = getActivityIcons(weatherData?.condition).random()
 
     Box(
         modifier = modifier
@@ -88,8 +96,8 @@ fun ScreenHeader(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Icon(
-                        imageVector = greetingIcon,
-                        contentDescription = "Cuaca saat ini",
+                        imageVector = activityIcon,
+                        contentDescription = "Aktivitas sesuai cuaca",
                         tint = Color.White,
                         modifier = Modifier.size(22.dp)
                     )
@@ -221,5 +229,35 @@ private fun getWeatherIcon(condition: String?): ImageVector {
         "hujan", "rain", "rainy", "drizzle", "shower" -> Icons.Default.Cloud
         "badai", "thunderstorm", "storm" -> Icons.Default.Thunderstorm
         else -> Icons.Default.Cloud
+    }
+}
+
+private fun getActivityIcons(condition: String?): List<ImageVector> {
+    return when (condition?.lowercase()) {
+        "cerah", "sunny", "clear" -> listOf(
+            Icons.AutoMirrored.Filled.DirectionsWalk, // jalan kaki
+            Icons.AutoMirrored.Filled.DirectionsBike, // sepeda
+            Icons.Filled.WbSunny
+        )
+        "berawan", "cloudy", "overcast" -> listOf(
+            Icons.AutoMirrored.Outlined.MenuBook,      // membaca
+            Icons.Filled.WbCloudy,                    // awan
+            Icons.Filled.Cloud                        // istirahat/bersantai
+        )
+        "hujan", "rain", "rainy", "drizzle", "shower" -> listOf(
+            Icons.Filled.Umbrella,                    // payung
+            Icons.Filled.Cloud,                       // awan/hujan
+            Icons.AutoMirrored.Outlined.MenuBook      // membaca di rumah
+        )
+        "badai", "thunderstorm", "storm" -> listOf(
+            Icons.Filled.Umbrella,                    // payung
+            Icons.Filled.Thunderstorm,                // badai
+            Icons.Filled.Cloud                        // awan gelap
+        )
+        else -> listOf(
+            Icons.AutoMirrored.Filled.DirectionsBike,
+            Icons.AutoMirrored.Filled.DirectionsWalk,
+            Icons.Filled.WbSunny
+        )
     }
 }
