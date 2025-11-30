@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import com.smart.keuneunong.domain.repository.CalendarRepository
+import com.smart.keuneunong.domain.usecase.GetRainfallHistoryUseCase
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -14,6 +15,7 @@ import com.smart.keuneunong.domain.repository.RepositoryKeuneunong
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val calendarRepository: CalendarRepository,
+    private val getRainfallHistoryUseCase: GetRainfallHistoryUseCase,
     val repositoryKeuneunong: RepositoryKeuneunong
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -39,11 +41,28 @@ class HomeViewModel @Inject constructor(
 
     private fun loadCalendar(month: Int, year: Int) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                currentMonth = month,
-                currentYear = year,
-                calendarDays = calendarRepository.getCalendarDays(month, year)
-            )
+            _uiState.value = _uiState.value.copy(isLoading = true)
+
+            try {
+                // Fetch rainfall data from use case
+                val rainfallData = getRainfallHistoryUseCase(month, year)
+
+                // Get calendar days with rainfall data
+                val calendarDays = calendarRepository.getCalendarDays(month, year, rainfallData)
+
+                _uiState.value = _uiState.value.copy(
+                    currentMonth = month,
+                    currentYear = year,
+                    calendarDays = calendarDays,
+                    isLoading = false,
+                    error = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message
+                )
+            }
         }
     }
 
