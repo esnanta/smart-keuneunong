@@ -6,6 +6,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Thunderstorm
+import androidx.compose.material.icons.filled.WbCloudy
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.data.model.WeatherData
 import com.smart.keuneunong.ui.location.LocationViewModel
 import java.util.Calendar
+import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
 fun ScreenHeader(
@@ -97,13 +101,13 @@ fun ScreenHeader(
             ) {
                 Column {
                     Text(
-                        text = "Smart Keuneunong",
+                        text = "Keuneunong",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "${currentDate.first} ${getMonthName(currentDate.second)} ${currentDate.third}",
+                        text = "Kalender Tradisional Aceh",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFBBDEFB)
                     )
@@ -136,48 +140,51 @@ fun ScreenHeader(
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
-                        weatherData != null -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        weatherData != null && locationDisplay.isNotEmpty() -> {
+                            Text(
+                                text = "📍 $locationDisplay",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFFBBDEFB),
                                 modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                Text(
-                                    text = "${weatherData.temperature}°C",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "•",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFBBDEFB)
-                                )
-                                Text(
-                                    text = weatherData.condition,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFBBDEFB)
-                                )
-                            }
-                            if (locationDisplay.isNotEmpty()) {
-                                Text(
-                                    text = "📍 $locationDisplay",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFBBDEFB),
-                                    modifier = Modifier.padding(top = 2.dp)
-                                )
-                            }
+                            )
                         }
                     }
                 }
 
-                Icon(
-                    imageVector = Icons.Default.Cloud,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.size(28.dp)
-                )
+                Column(horizontalAlignment = Alignment.End) {
+                    Icon(
+                        imageVector = getWeatherIcon(weatherData?.condition),
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.8f),
+                        modifier = Modifier.size(28.dp)
+                    )
+                    if (weatherData != null && !isLoadingWeather && weatherError == null) {
+                        Text(
+                            text = "${weatherData.temperature}°C",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                        Text(
+                            text = weatherData.condition,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFBBDEFB),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
+                    }
+                }
             }
         }
+    }
+}
+
+private fun getWeatherIcon(condition: String?): ImageVector {
+    return when (condition?.lowercase()) {
+        "cerah", "sunny", "clear" -> Icons.Default.WbSunny
+        "berawan", "cloudy", "overcast" -> Icons.Default.WbCloudy
+        "hujan", "rain", "rainy", "drizzle", "shower" -> Icons.Default.Cloud
+        "badai", "thunderstorm", "storm" -> Icons.Default.Thunderstorm
+        else -> Icons.Default.Cloud
     }
 }
