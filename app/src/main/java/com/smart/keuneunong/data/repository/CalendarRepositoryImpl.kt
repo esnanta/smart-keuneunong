@@ -1,12 +1,16 @@
 package com.smart.keuneunong.data.repository
 
 import com.smart.keuneunong.data.model.CalendarDayData
+import com.smart.keuneunong.data.network.WeatherApi
+import com.smart.keuneunong.data.preferences.LocationPreferencesManager
 import com.smart.keuneunong.domain.model.RainfallHistory
 import com.smart.keuneunong.domain.repository.CalendarRepository
 import com.smart.keuneunong.utils.DateUtils
-import javax.inject.Inject
 
-class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
+class CalendarRepositoryImpl(
+    private val weatherApi: WeatherApi,
+    private val locationPreferencesManager: LocationPreferencesManager
+) : CalendarRepository {
     override fun getCalendarDays(month: Int, year: Int, rainfallData: List<RainfallHistory>): List<CalendarDayData> {
         val days = mutableListOf<CalendarDayData>()
         val firstDayOfWeek = getFirstDayOfMonth(month, year)
