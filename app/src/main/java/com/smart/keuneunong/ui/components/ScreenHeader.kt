@@ -152,25 +152,36 @@ fun ScreenHeader(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    Icon(
-                        imageVector = getWeatherIcon(weatherData?.condition),
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.size(28.dp)
-                    )
                     if (weatherData != null && !isLoadingWeather && weatherError == null) {
-                        Text(
-                            text = "${weatherData.temperature}°C",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "${weatherData.temperature}°C",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                            Icon(
+                                imageVector = getWeatherIcon(weatherData.condition),
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.size(28.dp)
+                            )
+                        }
                         Text(
                             text = weatherData.condition,
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFFBBDEFB),
                             modifier = Modifier.padding(top = 2.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = getWeatherIcon(weatherData?.condition),
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }
