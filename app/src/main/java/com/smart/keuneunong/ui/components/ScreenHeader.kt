@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Thunderstorm
 import androidx.compose.material.icons.filled.WbCloudy
@@ -39,12 +40,13 @@ fun ScreenHeader(
     locationViewModel: LocationViewModel? = null
 ) {
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    val greeting = when (currentHour) {
-        in 5..11 -> "Selamat Pagi ☀️"
-        in 12..15 -> "Selamat Siang 🌤️"
-        in 16..18 -> "Selamat Sore 🌇"
-        else -> "Selamat Malam 🌙"
+    val greetingText = when (currentHour) {
+        in 5..11 -> "Selamat Pagi"
+        in 12..15 -> "Selamat Siang"
+        in 16..18 -> "Selamat Sore"
+        else -> "Selamat Malam"
     }
+    val greetingIcon = getWeatherIcon(weatherData?.condition)
 
     // Get location display using the same logic as HomeScreen
     val locationState = locationViewModel?.selectedLocation?.collectAsStateWithLifecycle()?.value
@@ -75,12 +77,23 @@ fun ScreenHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = greeting,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = Color(0xFFE3F2FD),
-                    fontWeight = FontWeight.Medium
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = greetingText,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFFE3F2FD),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(
+                        imageVector = greetingIcon,
+                        contentDescription = "Cuaca saat ini",
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
 
                 IconButton(
                     onClick = onMenuClick,
@@ -141,12 +154,23 @@ fun ScreenHeader(
                             )
                         }
                         weatherData != null && locationDisplay.isNotEmpty() -> {
-                            Text(
-                                text = "📍 $locationDisplay",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFFBBDEFB),
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
                                 modifier = Modifier.padding(top = 4.dp)
-                            )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = "Lokasi",
+                                    tint = Color(0xFFBBDEFB),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = locationDisplay,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color(0xFFBBDEFB)
+                                )
+                            }
                         }
                     }
                 }
