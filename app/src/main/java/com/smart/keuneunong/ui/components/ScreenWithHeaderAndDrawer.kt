@@ -40,6 +40,7 @@ fun ScreenWithHeaderAndDrawer(
     val weatherUiState by weatherViewModel.uiState.collectAsState()
     val locationState by locationViewModel.selectedLocation.collectAsState()
 
+
     // Reload weather when location changes
     LaunchedEffect(locationState) {
         if (locationState is com.smart.keuneunong.ui.location.LocationState.Success) {
@@ -99,7 +100,8 @@ fun ScreenWithHeaderAndDrawer(
                         onMenuClick = { scope.launch { drawerState.open() } },
                         weatherData = weatherUiState.weatherData,
                         isLoadingWeather = weatherUiState.isLoading,
-                        weatherError = weatherUiState.error
+                        weatherError = weatherUiState.error,
+                        locationViewModel = locationViewModel
                     )
                     content(innerPadding, getMonthName)
                 }
@@ -107,4 +109,3 @@ fun ScreenWithHeaderAndDrawer(
         }
     }
 }
-

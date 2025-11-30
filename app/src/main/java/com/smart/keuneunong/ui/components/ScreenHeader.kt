@@ -18,7 +18,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.data.model.WeatherData
+import com.smart.keuneunong.ui.location.LocationViewModel
 import java.util.Calendar
 
 @Composable
@@ -29,7 +31,8 @@ fun ScreenHeader(
     modifier: Modifier = Modifier,
     weatherData: WeatherData? = null,
     isLoadingWeather: Boolean = false,
-    weatherError: String? = null
+    weatherError: String? = null,
+    locationViewModel: LocationViewModel? = null
 ) {
     val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     val greeting = when (currentHour) {
@@ -37,6 +40,15 @@ fun ScreenHeader(
         in 12..15 -> "Selamat Siang 🌤️"
         in 16..18 -> "Selamat Sore 🌇"
         else -> "Selamat Malam 🌙"
+    }
+
+    // Get location display using the same logic as HomeScreen
+    val locationState = locationViewModel?.selectedLocation?.collectAsStateWithLifecycle()?.value
+    val locationDisplay = when (locationState) {
+        is com.smart.keuneunong.ui.location.LocationState.Success -> {
+            locationViewModel.getCityName(locationState.latitude, locationState.longitude)
+        }
+        else -> locationViewModel?.getCityName(5.1801, 97.1507) ?: weatherData?.location ?: ""
     }
 
     Box(
@@ -147,9 +159,9 @@ fun ScreenHeader(
                                     color = Color(0xFFBBDEFB)
                                 )
                             }
-                            if (weatherData.location.isNotEmpty()) {
+                            if (locationDisplay.isNotEmpty()) {
                                 Text(
-                                    text = "📍 ${weatherData.location}",
+                                    text = "📍 $locationDisplay",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = Color(0xFFBBDEFB),
                                     modifier = Modifier.padding(top = 2.dp)
@@ -169,4 +181,3 @@ fun ScreenHeader(
         }
     }
 }
-
