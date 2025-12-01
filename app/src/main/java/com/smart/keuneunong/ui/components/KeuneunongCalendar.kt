@@ -152,10 +152,15 @@ fun CalendarDayCell(
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
 
-                Text(
-                    text = dayData.weatherEmoji,
-                    fontSize = 14.sp
-                )
+                if (dayData.weatherEmoji != null) {
+                    Text(
+                        text = dayData.weatherEmoji,
+                        fontSize = 14.sp,
+                        modifier = Modifier.height(16.dp) // Maintain consistent height
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(16.dp)) // Placeholder to maintain alignment
+                }
 
                 Spacer(modifier = Modifier.height(2.dp))
 
@@ -223,12 +228,13 @@ fun CalendarDayCell(
  * Helper function untuk mendapatkan warna berdasarkan kategori curah hujan
  */
 @Composable
-private fun getRainfallColor(category: RainfallCategory): Color {
-    return when (category) {
+private fun getRainfallColor(category: String?): Color {
+    return when (category?.let { RainfallCategory.valueOf(it) }) {
         RainfallCategory.TINGGI -> RainfallHigh
         RainfallCategory.SEDANG -> RainfallMedium
         RainfallCategory.RENDAH -> RainfallLow
         RainfallCategory.SANGAT_RENDAH -> RainfallVeryLow
+        null -> Color.Transparent
     }
 }
 

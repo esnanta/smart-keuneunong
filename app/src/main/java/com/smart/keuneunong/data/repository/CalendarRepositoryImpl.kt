@@ -28,7 +28,7 @@ class CalendarRepositoryImpl @Inject constructor(
             val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
             val weatherEmoji = "" // Empty for now
             val hasSpecialEvent = day in listOf(15, 22)
-            val rainfallCategory = rainfallMap[day]?.category
+            val rainfallCategory = rainfallMap[day]?.category?.name
 
             days.add(CalendarDayData(day, today, weatherEmoji, hasSpecialEvent, rainfallCategory))
         }
@@ -47,8 +47,8 @@ class CalendarRepositoryImpl @Inject constructor(
     ): List<CalendarDayData> {
         // Only fetch weather for the current month and year
         if (month != DateUtils.getCurrentMonth() || year != DateUtils.getCurrentYear()) {
-            // If not the current month, just return the days with empty weather emojis
-            return days.map { it.copy(weatherEmoji = "") }
+            // If not the current month, just return the days with null weather emojis
+            return days.map { it.copy(weatherEmoji = null) }
         }
 
         val weatherData = weatherApi.getWeather(latitude, longitude)
@@ -98,7 +98,7 @@ class CalendarRepositoryImpl @Inject constructor(
             "Rain" -> "🌧️"
             "Clouds" -> "☁️"
             "Clear" -> "☀️"
-            else -> "❓"
+            else -> ""
         }
     }
 
