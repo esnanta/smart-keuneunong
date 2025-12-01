@@ -46,17 +46,30 @@ class CalendarRepositoryImpl @Inject constructor(
         longitude: Double
     ): List<CalendarDayData> {
         val weatherData = weatherApi.getWeather(latitude, longitude)
+
+        val today = Calendar.getInstance()
+        val todayDayOfYear = today.get(Calendar.DAY_OF_YEAR)
+
         val weatherMap = weatherData.list
-            .filter {
-                val cal = Calendar.getInstance()
-                cal.timeInMillis = it.dt * 1000
-                cal.get(Calendar.HOUR_OF_DAY) in 11..13 // Take forecast around noon
-            }
-            .distinctBy {
+            .groupBy {
                 val cal = Calendar.getInstance()
                 cal.timeInMillis = it.dt * 1000
                 cal.get(Calendar.DAY_OF_YEAR)
             }
+            .mapValues { (dayOfYear, forecasts) ->
+                if (dayOfYear == todayDayOfYear) {
+                    // For today, take the first available forecast
+                    forecasts.firstOrNull()
+                } else {
+                    // For other days, try to get the forecast around noon
+                    forecasts.find {
+                        val cal = Calendar.getInstance()
+                        cal.timeInMillis = it.dt * 1000
+                        cal.get(Calendar.HOUR_OF_DAY) in 11..13
+                    } ?: forecasts.firstOrNull() // Fallback to the first one if noon is not available
+                }
+            }
+            .mapNotNull { it.value } // Filter out null values
             .associate {
                 val cal = Calendar.getInstance()
                 cal.timeInMillis = it.dt * 1000
