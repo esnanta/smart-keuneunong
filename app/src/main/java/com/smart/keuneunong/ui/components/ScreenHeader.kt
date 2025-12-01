@@ -208,6 +208,12 @@ fun ScreenHeader(
                             color = Color(0xFFBBDEFB),
                             modifier = Modifier.padding(top = 2.dp)
                         )
+                        Text(
+                            text = "Terasa seperti ${weatherData.feelsLike}°C",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFBBDEFB),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
                     } else {
                         Icon(
                             imageVector = getWeatherIcon(weatherData?.condition),
