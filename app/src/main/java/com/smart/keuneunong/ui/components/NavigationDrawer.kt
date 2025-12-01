@@ -92,7 +92,7 @@ fun DrawerContent(
         val devs = listOf(
             Triple("Nantha Seutia", "Programmer", "NS"),
             Triple("Syahrul Hamdi", "Programmer", "SH"),
-            Triple("Rahmatsyah", "Pegiat Budaya Aceh", "R"),
+            Triple("Rahmatsyah", "Pegiat Budaya Aceh", "RM"),
             Triple("Nyakman Lamjame", "Pegiat Budaya Aceh", "NL"),
             Triple("Reny Fharina", "Pegiat Budaya Aceh", "RF")
         )
