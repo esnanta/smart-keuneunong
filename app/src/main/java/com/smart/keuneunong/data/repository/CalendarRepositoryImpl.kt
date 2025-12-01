@@ -11,17 +11,40 @@ import javax.inject.Inject
 class CalendarRepositoryImpl @Inject constructor(
     private val weatherApi: WeatherApi
 ) : CalendarRepository {
-    override suspend fun getCalendarDays(
+    override fun getCalendarDays(
         month: Int,
         year: Int,
-        rainfallData: List<RainfallHistory>,
-        latitude: Double,
-        longitude: Double
+        rainfallData: List<RainfallHistory>
     ): List<CalendarDayData> {
         val days = mutableListOf<CalendarDayData>()
         val firstDayOfWeek = getFirstDayOfMonth(month, year)
         val daysInMonth = getDaysInMonth(month, year)
 
+        // Create rainfall map for quick lookup
+        val rainfallMap = rainfallData.associateBy { it.day }
+
+        repeat(firstDayOfWeek) { days.add(CalendarDayData(day = 0)) }
+        for (day in 1..daysInMonth) {
+            val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
+            val weatherEmoji = "" // Empty for now
+            val hasSpecialEvent = day in listOf(15, 22)
+            val rainfallCategory = rainfallMap[day]?.category
+
+            days.add(CalendarDayData(day, today, weatherEmoji, hasSpecialEvent, rainfallCategory))
+        }
+        val totalCells = days.size
+        val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
+        repeat(remainingCells) { days.add(CalendarDayData(day = 0)) }
+        return days
+    }
+
+    override suspend fun getUpdatedCalendarDaysWithWeather(
+        days: List<CalendarDayData>,
+        month: Int,
+        year: Int,
+        latitude: Double,
+        longitude: Double
+    ): List<CalendarDayData> {
         val weatherData = weatherApi.getWeather(latitude, longitude)
         val weatherMap = weatherData.list
             .filter {
@@ -40,23 +63,15 @@ class CalendarRepositoryImpl @Inject constructor(
                 cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
             }
 
-        // Create rainfall map for quick lookup
-        val rainfallMap = rainfallData.associateBy { it.day }
-
-        repeat(firstDayOfWeek) { days.add(CalendarDayData(day = 0)) }
-        for (day in 1..daysInMonth) {
-            val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
-            val weatherCondition = weatherMap[day]
-            val weatherEmoji = getWeatherEmoji(weatherCondition)
-            val hasSpecialEvent = day in listOf(15, 22)
-            val rainfallCategory = rainfallMap[day]?.category
-
-            days.add(CalendarDayData(day, today, weatherEmoji, hasSpecialEvent, rainfallCategory))
+        return days.map { dayData ->
+            if (dayData.day > 0) {
+                val weatherCondition = weatherMap[dayData.day]
+                val weatherEmoji = getWeatherEmoji(weatherCondition)
+                dayData.copy(weatherEmoji = weatherEmoji)
+            } else {
+                dayData
+            }
         }
-        val totalCells = days.size
-        val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
-        repeat(remainingCells) { days.add(CalendarDayData(day = 0)) }
-        return days
     }
 
     private fun getWeatherEmoji(weather: String?): String {
