@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
         loadCalendar(month, year)
     }
 
-    private fun loadCalendar(month: Int, year: Int) {
+    private fun loadCalendar(month: Int, year: Int, latitude: Double = 5.55, longitude: Double = 95.32) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
@@ -48,7 +48,7 @@ class HomeViewModel @Inject constructor(
                 val rainfallData = getRainfallHistoryUseCase(month, year)
 
                 // Get calendar days with rainfall data
-                val calendarDays = calendarRepository.getCalendarDays(month, year, rainfallData)
+                val calendarDays = calendarRepository.getCalendarDays(month, year, rainfallData, latitude, longitude)
 
                 _uiState.value = _uiState.value.copy(
                     currentMonth = month,

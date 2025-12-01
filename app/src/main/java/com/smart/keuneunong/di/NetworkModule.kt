@@ -1,7 +1,5 @@
 package com.smart.keuneunong.di
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.smart.keuneunong.BuildConfig
 import com.smart.keuneunong.data.network.WeatherApi
 import dagger.Module
@@ -11,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -34,19 +32,14 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    @WeatherApiRetrofit
     fun provideWeatherRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder()
-        .addConverterFactory(
-            JacksonConverterFactory.create(
-                XmlMapper().registerKotlinModule()
-            )
-        )
-        .baseUrl("https://data.bmkg.go.id/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .baseUrl("https://api.openweathermap.org/")
         .client(okHttpClient)
         .build()
 
     @Provides
     @Singleton
-    fun provideWeatherApiService(@WeatherApiRetrofit retrofit: Retrofit): WeatherApi =
+    fun provideWeatherApiService(retrofit: Retrofit): WeatherApi =
         retrofit.create(WeatherApi::class.java)
 }

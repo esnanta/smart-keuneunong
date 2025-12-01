@@ -1,16 +1,44 @@
 package com.smart.keuneunong.data.repository
 
 import com.smart.keuneunong.data.model.CalendarDayData
+import com.smart.keuneunong.data.network.WeatherApi
 import com.smart.keuneunong.domain.model.RainfallHistory
 import com.smart.keuneunong.domain.repository.CalendarRepository
 import com.smart.keuneunong.utils.DateUtils
+import java.util.Calendar
 import javax.inject.Inject
 
-class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
-    override fun getCalendarDays(month: Int, year: Int, rainfallData: List<RainfallHistory>): List<CalendarDayData> {
+class CalendarRepositoryImpl @Inject constructor(
+    private val weatherApi: WeatherApi
+) : CalendarRepository {
+    override suspend fun getCalendarDays(
+        month: Int,
+        year: Int,
+        rainfallData: List<RainfallHistory>,
+        latitude: Double,
+        longitude: Double
+    ): List<CalendarDayData> {
         val days = mutableListOf<CalendarDayData>()
         val firstDayOfWeek = getFirstDayOfMonth(month, year)
         val daysInMonth = getDaysInMonth(month, year)
+
+        val weatherData = weatherApi.getWeather(latitude, longitude)
+        val weatherMap = weatherData.list
+            .filter {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = it.dt * 1000
+                cal.get(Calendar.HOUR_OF_DAY) in 11..13 // Take forecast around noon
+            }
+            .distinctBy {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = it.dt * 1000
+                cal.get(Calendar.DAY_OF_YEAR)
+            }
+            .associate {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = it.dt * 1000
+                cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
+            }
 
         // Create rainfall map for quick lookup
         val rainfallMap = rainfallData.associateBy { it.day }
@@ -18,12 +46,8 @@ class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
         repeat(firstDayOfWeek) { days.add(CalendarDayData(day = 0)) }
         for (day in 1..daysInMonth) {
             val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
-            val weatherEmoji = when {
-                day in listOf(3, 10, 17, 24) -> "🌧️"
-                day in listOf(2, 7, 9, 11, 14, 18, 21, 25, 27) -> "⛅"
-                day in listOf(16, 23, 29) -> "☁️"
-                else -> "☀️"
-            }
+            val weatherCondition = weatherMap[day]
+            val weatherEmoji = getWeatherEmoji(weatherCondition)
             val hasSpecialEvent = day in listOf(15, 22)
             val rainfallCategory = rainfallMap[day]?.category
 
@@ -33,6 +57,15 @@ class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
         val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
         repeat(remainingCells) { days.add(CalendarDayData(day = 0)) }
         return days
+    }
+
+    private fun getWeatherEmoji(weather: String?): String {
+        return when (weather) {
+            "Rain" -> "🌧️"
+            "Clouds" -> "☁️"
+            "Clear" -> "☀️"
+            else -> ""
+        }
     }
 
     private fun getFirstDayOfMonth(month: Int, year: Int): Int {
