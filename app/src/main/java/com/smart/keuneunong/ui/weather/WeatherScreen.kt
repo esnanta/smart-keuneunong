@@ -83,46 +83,6 @@ fun WeatherContent(weatherData: WeatherData) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Current Weather Info
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = weatherData.weatherIcon, fontSize = 48.sp)
-                Spacer(modifier = Modifier.width(16.dp))
-                Column {
-                    Text(
-                        text = "${weatherData.temperature}°C",
-                        style = MaterialTheme.typography.displayMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Gray900
-                    )
-                    Text(
-                        text = "Terasa seperti ${weatherData.feelsLike}°C",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Gray600
-                    )
-                }
-            }
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = weatherData.location,
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Gray700
-                )
-                Text(
-                    text = SimpleDateFormat("EEEE, dd MMMM", Locale.getDefault()).format(Date(weatherData.date)),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Gray500
-                )
-                Text(
-                    text = weatherData.condition,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Gray500
-                )
-            }
-        }
 
         // Konteks Keuneunong
         KeuneunongContext(contextText = weatherData.keuneunongContext)
@@ -155,7 +115,7 @@ fun KeuneunongContext(contextText: String) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Konteks Keuneunong",
+                text = "Keuneunong",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Blue800
