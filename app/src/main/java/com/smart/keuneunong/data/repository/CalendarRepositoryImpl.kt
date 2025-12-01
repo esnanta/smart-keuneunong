@@ -45,6 +45,12 @@ class CalendarRepositoryImpl @Inject constructor(
         latitude: Double,
         longitude: Double
     ): List<CalendarDayData> {
+        // Only fetch weather for the current month and year
+        if (month != DateUtils.getCurrentMonth() || year != DateUtils.getCurrentYear()) {
+            // If not the current month, just return the days with empty weather emojis
+            return days.map { it.copy(weatherEmoji = "") }
+        }
+
         val weatherData = weatherApi.getWeather(latitude, longitude)
 
         val today = Calendar.getInstance()
