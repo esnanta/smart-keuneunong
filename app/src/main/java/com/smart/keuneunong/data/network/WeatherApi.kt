@@ -1,5 +1,6 @@
 package com.smart.keuneunong.data.network
 
+import com.smart.keuneunong.BuildConfig
 import com.smart.keuneunong.data.network.model.WeatherData
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -10,7 +11,7 @@ interface WeatherApi {
     suspend fun getWeather(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
-        @Query("appid") appid: String = "d62bad4d4dcca7f00bdb8f860dc9819c", // TODO: Move to a secure place
+        @Query("appid") appid: String = BuildConfig.WEATHER_API_KEY,
         @Query("units") units: String = "metric"
     ): WeatherData
 }

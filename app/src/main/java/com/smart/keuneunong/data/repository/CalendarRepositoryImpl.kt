@@ -98,7 +98,7 @@ class CalendarRepositoryImpl @Inject constructor(
             "Rain" -> "🌧️"
             "Clouds" -> "☁️"
             "Clear" -> "☀️"
-            else -> ""
+            else -> "❓"
         }
     }
 
