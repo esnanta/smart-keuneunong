@@ -25,7 +25,7 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,6 +49,7 @@ import com.smart.keuneunong.ui.theme.Gray50
 import com.smart.keuneunong.ui.theme.Gray700
 import com.smart.keuneunong.ui.theme.Gray900
 import com.smart.keuneunong.ui.theme.SmartKeuneunongTheme
+import com.smart.keuneunong.utils.DateUtils
 
 @Composable
 fun WeatherScreen(
@@ -91,8 +92,10 @@ fun WeatherScreen(
     }
 }
 
+
 @Composable
 fun WeatherContent(weatherData: WeatherData) {
+    val hijriDate = DateUtils.getCurrentHijriDate().formatHijriWithYear()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,7 +105,10 @@ fun WeatherContent(weatherData: WeatherData) {
     ) {
 
         // Konteks Keuneunong
-        KeuneunongContext(contextText = weatherData.keuneunongContext)
+        KeuneunongContext(
+            hijriDate = hijriDate,
+            contextText = weatherData.keuneunongContext
+        )
 
         // Detail Hari Ini
         DailyDetails(
@@ -124,19 +130,31 @@ fun WeatherContent(weatherData: WeatherData) {
 }
 
 @Composable
-fun KeuneunongContext(contextText: String) {
+fun KeuneunongContext(hijriDate: String, contextText: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Blue50)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Keuneunong",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Blue800
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Keuneunong",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Blue800
+                )
+                Text(
+                    text = hijriDate,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Blue800
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = contextText,
@@ -197,7 +215,7 @@ fun SeaForecast(waveHeightMin: Double, waveHeightMax: Double, windSpeed: String,
                 InfoRow(icon = Icons.Default.Waves, label = "Tinggi Gelombang", value = "$waveHeightMin - $waveHeightMax m")
                 InfoRow(icon = Icons.Default.Air, label = "Angin di Laut", value = "$windSpeed ($windDirection)")
 
-                Divider(modifier = Modifier.padding(vertical = 8.dp))
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 Text(
                     text = summary,

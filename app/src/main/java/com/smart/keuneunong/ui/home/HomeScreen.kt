@@ -115,7 +115,7 @@ fun HomeContent(
                 QuickStatCard(
                     icon = hijriDate.day.toString(),
                     title = "Uroe Buleun",
-                    value = com.smart.keuneunong.utils.DateUtils.getHijriMonthName(hijriDate.month),
+                    value = com.smart.keuneunong.utils.DateUtils.getUroeBuleunMonthName(hijriDate.month),
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatCard(

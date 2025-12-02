@@ -101,7 +101,7 @@ object DateUtils {
         return HijriDate(hijriYear, hijriMonth, hijriDay)
     }
 
-    fun getHijriMonthName(month: Int): String {
+    fun getUroeBuleunMonthName(month: Int): String {
         return when (month) {
             1 -> "Asan Usen"
             2 -> "Sapha"
@@ -119,12 +119,31 @@ object DateUtils {
         }
     }
 
+    fun getHijriMonthName(month: Int): String {
+        return when (month) {
+            1 -> "Muharram"
+            2 -> "Safar"
+            3 -> "Rabiul Awal"
+            4 -> "Rabiul Akhir"
+            5 -> "Jumadil Awal"
+            6 -> "Jumadil Akhir"
+            7 -> "Rajab"
+            8 -> "Syaban"
+            9 -> "Ramadan"
+            10 -> "Syawal"
+            11 -> "Zulkaidah"
+            12 -> "Zulhijjah"
+            else -> "Unknown"
+        }
+    }
+
     data class HijriDate(
         val year: Int,
         val month: Int,
         val day: Int
     ) {
-        fun format(): String = "$day ${getHijriMonthName(month)}"
-        fun formatWithYear(): String = "$day ${getHijriMonthName(month)} $year H"
+        fun format(): String = "$day ${getUroeBuleunMonthName(month)}"
+        fun formatWithYear(): String = "$day ${getUroeBuleunMonthName(month)} $year H"
+        fun formatHijriWithYear(): String = "$day ${getHijriMonthName(month)} $year H"
     }
 }
