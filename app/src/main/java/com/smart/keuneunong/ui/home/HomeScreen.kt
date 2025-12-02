@@ -96,6 +96,8 @@ fun HomeContent(
     ) {
         /** ---------- QUICK INFO CARDS ---------- **/
         item {
+            val hijriDate = remember { com.smart.keuneunong.utils.DateUtils.getCurrentHijriDate() }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,9 +105,9 @@ fun HomeContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 QuickStatCard(
-                    icon = com.smart.keuneunong.utils.DateUtils.getCurrentDay().toString(),
-                    title = "Bulan",
-                    value = com.smart.keuneunong.utils.DateUtils.getMonthName(com.smart.keuneunong.utils.DateUtils.getCurrentMonth()),
+                    icon = hijriDate.day.toString(),
+                    title = "Uroe Buleun",
+                    value = com.smart.keuneunong.utils.DateUtils.getHijriMonthName(hijriDate.month),
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatCard(
