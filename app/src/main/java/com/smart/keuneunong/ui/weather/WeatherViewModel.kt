@@ -2,7 +2,6 @@ package com.smart.keuneunong.ui.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smart.keuneunong.data.model.WeatherData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +16,6 @@ class WeatherViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-
-    init {
-        loadWeather()
-    }
 
     fun loadWeather(locationState: com.smart.keuneunong.ui.location.LocationState? = null) {
         viewModelScope.launch {

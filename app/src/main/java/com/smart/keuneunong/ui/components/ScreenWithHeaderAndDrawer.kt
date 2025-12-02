@@ -40,6 +40,16 @@ fun ScreenWithHeaderAndDrawer(
     val weatherUiState by weatherViewModel.uiState.collectAsState()
     val locationState by locationViewModel.selectedLocation.collectAsState()
 
+    // Defer weather loading until after initial composition
+    // This prevents blocking the main thread during UI rendering
+    LaunchedEffect(Unit) {
+        // Initial load with default or saved location
+        weatherViewModel.loadWeather(
+            if (locationState is com.smart.keuneunong.ui.location.LocationState.Success) {
+                locationState as com.smart.keuneunong.ui.location.LocationState.Success
+            } else null
+        )
+    }
 
     // Reload weather when location changes
     LaunchedEffect(locationState) {

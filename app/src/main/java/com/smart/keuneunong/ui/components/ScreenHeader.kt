@@ -5,19 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Thunderstorm
 import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -136,22 +132,7 @@ fun ScreenHeader(
                     // Weather info from API
                     when {
                         isLoadingWeather -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(12.dp),
-                                    color = Color.White,
-                                    strokeWidth = 1.5.dp
-                                )
-                                Text(
-                                    text = "Memuat cuaca...",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFBBDEFB)
-                                )
-                            }
+                            LocationSkeleton(modifier = Modifier.padding(top = 4.dp))
                         }
                         weatherError != null -> {
                             Text(
@@ -184,7 +165,10 @@ fun ScreenHeader(
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    if (weatherData != null && !isLoadingWeather && weatherError == null) {
+                    if (isLoadingWeather) {
+                        // Show skeleton loading for weather data
+                        WeatherSkeleton()
+                    } else if (weatherData != null && weatherError == null) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -216,7 +200,7 @@ fun ScreenHeader(
                         )
                     } else {
                         Icon(
-                            imageVector = getWeatherIcon(weatherData?.condition),
+                            imageVector = getWeatherIcon(null),
                             contentDescription = null,
                             tint = Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.size(28.dp)
