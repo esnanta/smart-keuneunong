@@ -144,20 +144,20 @@ fun CalendarDayCell(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             ) {
 
                 if (dayData.weatherEmoji != null) {
                     Text(
                         text = dayData.weatherEmoji,
-                        fontSize = 14.sp,
-                        modifier = Modifier.height(16.dp) // Maintain consistent height
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(20.dp) // Increased height for better display
                     )
                 } else {
-                    Spacer(modifier = Modifier.height(16.dp)) // Placeholder to maintain alignment
+                    Spacer(modifier = Modifier.height(20.dp)) // Placeholder to maintain alignment
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Day number with highlight for current day
                 Box(
