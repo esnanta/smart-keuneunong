@@ -1,5 +1,6 @@
 package com.smart.keuneunong.data.repository
 
+import timber.log.Timber
 import com.smart.keuneunong.data.model.CalendarDayData
 import com.smart.keuneunong.data.network.WeatherApi
 import com.smart.keuneunong.domain.model.RainfallHistory
@@ -51,44 +52,62 @@ class CalendarRepositoryImpl @Inject constructor(
             return days.map { it.copy(weatherEmoji = null) }
         }
 
-        val weatherData = weatherApi.getWeather(latitude, longitude)
+        return try {
+            val weatherData = weatherApi.getWeather(latitude, longitude)
 
-        val today = Calendar.getInstance()
-        val todayDayOfYear = today.get(Calendar.DAY_OF_YEAR)
+            val today = Calendar.getInstance()
+            val todayDayOfYear = today.get(Calendar.DAY_OF_YEAR)
 
-        val weatherMap = weatherData.list
-            .groupBy {
-                val cal = Calendar.getInstance()
-                cal.timeInMillis = it.dt * 1000
-                cal.get(Calendar.DAY_OF_YEAR)
-            }
-            .mapValues { (dayOfYear, forecasts) ->
-                if (dayOfYear == todayDayOfYear) {
-                    // For today, take the first available forecast
-                    forecasts.firstOrNull()
+            val weatherMap = weatherData.list
+                .groupBy {
+                    val cal = Calendar.getInstance()
+                    cal.timeInMillis = it.dt * 1000
+                    cal.get(Calendar.DAY_OF_YEAR)
+                }
+                .mapValues { (dayOfYear, forecasts) ->
+                    if (dayOfYear == todayDayOfYear) {
+                        // For today, take the first available forecast
+                        forecasts.firstOrNull()
+                    } else {
+                        // For other days, try to get the forecast around noon
+                        forecasts.find {
+                            val cal = Calendar.getInstance()
+                            cal.timeInMillis = it.dt * 1000
+                            cal.get(Calendar.HOUR_OF_DAY) in 11..13
+                        } ?: forecasts.firstOrNull() // Fallback to the first one if noon is not available
+                    }
+                }
+                .mapNotNull { it.value } // Filter out null values
+                .associate {
+                    val cal = Calendar.getInstance()
+                    cal.timeInMillis = it.dt * 1000
+                    cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
+                }
+
+            days.map { dayData ->
+                if (dayData.day > 0) {
+                    val weatherCondition = weatherMap[dayData.day]
+                    val weatherEmoji = getWeatherEmoji(weatherCondition)
+                    dayData.copy(weatherEmoji = weatherEmoji)
                 } else {
-                    // For other days, try to get the forecast around noon
-                    forecasts.find {
-                        val cal = Calendar.getInstance()
-                        cal.timeInMillis = it.dt * 1000
-                        cal.get(Calendar.HOUR_OF_DAY) in 11..13
-                    } ?: forecasts.firstOrNull() // Fallback to the first one if noon is not available
+                    dayData
                 }
             }
-            .mapNotNull { it.value } // Filter out null values
-            .associate {
-                val cal = Calendar.getInstance()
-                cal.timeInMillis = it.dt * 1000
-                cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
-            }
-
-        return days.map { dayData ->
-            if (dayData.day > 0) {
-                val weatherCondition = weatherMap[dayData.day]
-                val weatherEmoji = getWeatherEmoji(weatherCondition)
-                dayData.copy(weatherEmoji = weatherEmoji)
-            } else {
-                dayData
+        } catch (e: Exception) {
+            // If API call fails, return days with mock weather emojis based on rainfall category
+            Timber.e(e, "Failed to fetch weather data, using mock data")
+            days.map { dayData ->
+                if (dayData.day > 0) {
+                    val weatherEmoji = when (dayData.rainfallCategory) {
+                        "Tinggi" -> "🌧️"
+                        "Sedang" -> "☁️"
+                        "Rendah" -> "⛅"
+                        else -> if (dayData.day % 3 == 0) "☁️" else "☀️" // Simple pattern for mock data
+                    }
+                    dayData.copy(weatherEmoji = weatherEmoji)
+                } else {
+                    dayData
+                }
             }
         }
     }
