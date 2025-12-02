@@ -35,6 +35,7 @@ fun ScreenWithHeaderAndDrawer(
     val scope = rememberCoroutineScope()
     var showAboutDialog by remember { mutableStateOf(false) }
     var showLocationPicker by remember { mutableStateOf(false) }
+    var showCityPicker by remember { mutableStateOf(false) }
 
     // Collect weather data from ViewModel
     val weatherUiState by weatherViewModel.uiState.collectAsState()
@@ -78,6 +79,16 @@ fun ScreenWithHeaderAndDrawer(
         )
     }
 
+    if (showCityPicker) {
+        CityPickerDialog(
+            onDismiss = { showCityPicker = false },
+            onCitySelected = { city ->
+                // Save the selected city location
+                locationViewModel.saveLocation(city.latitude, city.longitude)
+            }
+        )
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -88,6 +99,10 @@ fun ScreenWithHeaderAndDrawer(
                 },
                 onShowLocationPicker = {
                     showLocationPicker = true
+                    scope.launch { drawerState.close() }
+                },
+                onShowCityPicker = {
+                    showCityPicker = true
                     scope.launch { drawerState.close() }
                 }
             )
