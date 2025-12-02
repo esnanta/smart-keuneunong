@@ -157,7 +157,7 @@ fun CalendarDayCell(
                     Spacer(modifier = Modifier.height(16.dp)) // Placeholder to maintain alignment
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Day number with highlight for current day
                 Box(
