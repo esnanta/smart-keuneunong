@@ -57,33 +57,36 @@ fun WeatherScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Gray50)
-            .padding(contentPadding)
-            .verticalScroll(rememberScrollState())
-    ) {
-        if (uiState.isLoading) {
+    when {
+        uiState.isLoading -> {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 100.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
-        } else if (uiState.error != null) {
+        }
+        uiState.error != null -> {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = uiState.error!!, color = Color.Red)
+                Text(
+                    text = uiState.error!!,
+                    color = MaterialTheme.colorScheme.error
+                )
             }
-        } else if (uiState.weatherData != null) {
-            WeatherContent(uiState.weatherData!!)
+        }
+        uiState.weatherData != null -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Gray50)
+                    .padding(contentPadding)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                WeatherContent(uiState.weatherData!!)
+            }
         }
     }
 }
