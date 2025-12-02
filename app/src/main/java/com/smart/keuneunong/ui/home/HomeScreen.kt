@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
+import com.smart.keuneunong.ui.components.CalendarSkeleton
 import androidx.hilt.navigation.compose.hiltViewModel
 import java.util.Locale
 import androidx.compose.material.icons.Icons
@@ -86,6 +88,12 @@ fun HomeContent(
         else -> locationViewModel.getCityName(5.1801, 97.1507)
     }
 
+    // Defer calendar loading until after initial composition
+    // This prevents blocking the main thread during UI rendering
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialCalendar()
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -128,14 +136,32 @@ fun HomeContent(
         /** ---------- KALENDER ---------- **/
         item {
             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                CalendarComponent(
-                    currentMonth = uiState.currentMonth,
-                    currentYear = uiState.currentYear,
-                    calendarDays = uiState.calendarDays,
-                    onPreviousMonth = viewModel::onPreviousMonth,
-                    onNextMonth = viewModel::onNextMonth,
-                    getMonthName = viewModel::getMonthName
-                )
+                if (uiState.isLoading && uiState.calendarDays.isEmpty()) {
+                    // Show skeleton loading while calendar is loading for first time
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(8.dp, RoundedCornerShape(24.dp)),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        )
+                    ) {
+                        CalendarSkeleton(
+                            modifier = Modifier.padding(20.dp)
+                        )
+                    }
+                } else {
+                    // Show actual calendar data
+                    CalendarComponent(
+                        currentMonth = uiState.currentMonth,
+                        currentYear = uiState.currentYear,
+                        calendarDays = uiState.calendarDays,
+                        onPreviousMonth = viewModel::onPreviousMonth,
+                        onNextMonth = viewModel::onNextMonth,
+                        getMonthName = viewModel::getMonthName
+                    )
+                }
             }
         }
 

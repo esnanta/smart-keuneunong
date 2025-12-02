@@ -151,3 +151,112 @@ fun LocationSkeleton(
     }
 }
 
+/**
+ * Skeleton loading for calendar component
+ * Shows placeholder for calendar grid while loading
+ */
+@Composable
+fun CalendarSkeleton(
+    modifier: Modifier = Modifier
+) {
+    val shimmerColors = listOf(
+        Color.LightGray.copy(alpha = 0.3f),
+        Color.LightGray.copy(alpha = 0.5f),
+        Color.LightGray.copy(alpha = 0.3f)
+    )
+
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1200,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_translate"
+    )
+
+    val brush = Brush.linearGradient(
+        colors = shimmerColors,
+        start = Offset(translateAnim - 1000f, translateAnim - 1000f),
+        end = Offset(translateAnim, translateAnim)
+    )
+
+    Column(
+        modifier = modifier
+    ) {
+        // Calendar header skeleton
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(brush)
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(150.dp)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(brush)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Day headers skeleton
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            repeat(7) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(16.dp)
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Calendar grid skeleton (5 rows)
+        repeat(5) { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                repeat(7) { col ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .padding(2.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(brush)
+                    )
+                }
+            }
+            if (row < 4) Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
+}
+
