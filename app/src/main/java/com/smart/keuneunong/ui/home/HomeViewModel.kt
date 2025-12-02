@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
         loadCalendar(month, year)
     }
 
-    private fun loadCalendar(month: Int, year: Int) {
+    private fun loadCalendar(month: Int, year: Int, latitude: Double = 5.55, longitude: Double = 95.32) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
@@ -47,7 +47,7 @@ class HomeViewModel @Inject constructor(
                 // Fetch rainfall data from use case
                 val rainfallData = getRainfallHistoryUseCase(month, year)
 
-                // Get calendar days with rainfall data
+                // Get calendar days without weather first
                 val calendarDays = calendarRepository.getCalendarDays(month, year, rainfallData)
 
                 _uiState.value = _uiState.value.copy(
@@ -57,6 +57,19 @@ class HomeViewModel @Inject constructor(
                     isLoading = false,
                     error = null
                 )
+
+                // Then, update with weather data in the background
+                viewModelScope.launch {
+                    val updatedDays = calendarRepository.getUpdatedCalendarDaysWithWeather(
+                        calendarDays,
+                        month,
+                        year,
+                        latitude,
+                        longitude
+                    )
+                    _uiState.value = _uiState.value.copy(calendarDays = updatedDays)
+                }
+
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

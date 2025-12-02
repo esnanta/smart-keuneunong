@@ -1,13 +1,21 @@
 package com.smart.keuneunong.data.repository
 
 import com.smart.keuneunong.data.model.CalendarDayData
+import com.smart.keuneunong.data.network.WeatherApi
 import com.smart.keuneunong.domain.model.RainfallHistory
 import com.smart.keuneunong.domain.repository.CalendarRepository
 import com.smart.keuneunong.utils.DateUtils
+import java.util.Calendar
 import javax.inject.Inject
 
-class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
-    override fun getCalendarDays(month: Int, year: Int, rainfallData: List<RainfallHistory>): List<CalendarDayData> {
+class CalendarRepositoryImpl @Inject constructor(
+    private val weatherApi: WeatherApi
+) : CalendarRepository {
+    override fun getCalendarDays(
+        month: Int,
+        year: Int,
+        rainfallData: List<RainfallHistory>
+    ): List<CalendarDayData> {
         val days = mutableListOf<CalendarDayData>()
         val firstDayOfWeek = getFirstDayOfMonth(month, year)
         val daysInMonth = getDaysInMonth(month, year)
@@ -18,12 +26,7 @@ class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
         repeat(firstDayOfWeek) { days.add(CalendarDayData(day = 0)) }
         for (day in 1..daysInMonth) {
             val today = DateUtils.getCurrentDay() == day && DateUtils.getCurrentMonth() == month && DateUtils.getCurrentYear() == year
-            val weatherEmoji = when {
-                day in listOf(3, 10, 17, 24) -> "🌧️"
-                day in listOf(2, 7, 9, 11, 14, 18, 21, 25, 27) -> "⛅"
-                day in listOf(16, 23, 29) -> "☁️"
-                else -> "☀️"
-            }
+            val weatherEmoji = "" // Empty for now
             val hasSpecialEvent = day in listOf(15, 22)
             val rainfallCategory = rainfallMap[day]?.category
 
@@ -33,6 +36,70 @@ class CalendarRepositoryImpl @Inject constructor() : CalendarRepository {
         val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
         repeat(remainingCells) { days.add(CalendarDayData(day = 0)) }
         return days
+    }
+
+    override suspend fun getUpdatedCalendarDaysWithWeather(
+        days: List<CalendarDayData>,
+        month: Int,
+        year: Int,
+        latitude: Double,
+        longitude: Double
+    ): List<CalendarDayData> {
+        // Only fetch weather for the current month and year
+        if (month != DateUtils.getCurrentMonth() || year != DateUtils.getCurrentYear()) {
+            // If not the current month, just return the days with empty weather emojis
+            return days.map { it.copy(weatherEmoji = "") }
+        }
+
+        val weatherData = weatherApi.getWeather(latitude, longitude)
+
+        val today = Calendar.getInstance()
+        val todayDayOfYear = today.get(Calendar.DAY_OF_YEAR)
+
+        val weatherMap = weatherData.list
+            .groupBy {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = it.dt * 1000
+                cal.get(Calendar.DAY_OF_YEAR)
+            }
+            .mapValues { (dayOfYear, forecasts) ->
+                if (dayOfYear == todayDayOfYear) {
+                    // For today, take the first available forecast
+                    forecasts.firstOrNull()
+                } else {
+                    // For other days, try to get the forecast around noon
+                    forecasts.find {
+                        val cal = Calendar.getInstance()
+                        cal.timeInMillis = it.dt * 1000
+                        cal.get(Calendar.HOUR_OF_DAY) in 11..13
+                    } ?: forecasts.firstOrNull() // Fallback to the first one if noon is not available
+                }
+            }
+            .mapNotNull { it.value } // Filter out null values
+            .associate {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = it.dt * 1000
+                cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
+            }
+
+        return days.map { dayData ->
+            if (dayData.day > 0) {
+                val weatherCondition = weatherMap[dayData.day]
+                val weatherEmoji = getWeatherEmoji(weatherCondition)
+                dayData.copy(weatherEmoji = weatherEmoji)
+            } else {
+                dayData
+            }
+        }
+    }
+
+    private fun getWeatherEmoji(weather: String?): String {
+        return when (weather) {
+            "Rain" -> "🌧️"
+            "Clouds" -> "☁️"
+            "Clear" -> "☀️"
+            else -> "❓"
+        }
     }
 
     private fun getFirstDayOfMonth(month: Int, year: Int): Int {

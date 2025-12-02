@@ -29,6 +29,7 @@ android {
         manifestPlaceholders = [
             MAPS_API_KEY: localProperties.getProperty('MAPS_API_KEY', 'YOUR_API_KEY_HERE')
         ]
+        buildConfigField "String", "WEATHER_API_KEY", "\"${localProperties.getProperty('WEATHER_API_KEY', 'd62bad4d4dcca7f00bdb8f860dc9819c')}\""
     }
 
     buildTypes {
@@ -87,10 +88,8 @@ dependencies {
     def retrofit_version = '2.9.0'
     def okhttp_version = '4.12.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
-    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3'
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.google.code.gson:gson:2.10.1"
     implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
 
