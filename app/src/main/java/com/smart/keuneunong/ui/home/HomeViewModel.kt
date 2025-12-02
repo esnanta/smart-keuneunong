@@ -21,9 +21,6 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    // Remove init block to prevent blocking on ViewModel creation
-    // Calendar loading will be triggered by UI lifecycle via LaunchedEffect
-
     fun loadInitialCalendar() {
         loadCalendar(_uiState.value.currentMonth, _uiState.value.currentYear)
     }
@@ -84,5 +81,9 @@ class HomeViewModel @Inject constructor(
 
     fun getMonthName(month: Int): String {
         return calendarRepository.getMonthName(month)
+    }
+
+    fun refresh() {
+        loadCalendar(_uiState.value.currentMonth, _uiState.value.currentYear)
     }
 }

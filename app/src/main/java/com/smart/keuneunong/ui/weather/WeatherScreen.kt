@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.NightsStay
@@ -51,6 +53,7 @@ import com.smart.keuneunong.ui.theme.Gray900
 import com.smart.keuneunong.ui.theme.SmartKeuneunongTheme
 import com.smart.keuneunong.utils.DateUtils
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel(),
@@ -58,35 +61,41 @@ fun WeatherScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    when {
-        uiState.isLoading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
+    PullToRefreshBox(
+        isRefreshing = uiState.isLoading,
+        onRefresh = { viewModel.refresh() },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when {
+            uiState.isLoading && uiState.weatherData == null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
-        }
-        uiState.error != null -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = uiState.error!!,
-                    color = MaterialTheme.colorScheme.error
-                )
+            uiState.error != null && uiState.weatherData == null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.error!!,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             }
-        }
-        uiState.weatherData != null -> {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Gray50)
-                    .padding(contentPadding)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                WeatherContent(uiState.weatherData!!)
+            uiState.weatherData != null -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Gray50)
+                        .padding(contentPadding)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    WeatherContent(uiState.weatherData!!)
+                }
             }
         }
     }

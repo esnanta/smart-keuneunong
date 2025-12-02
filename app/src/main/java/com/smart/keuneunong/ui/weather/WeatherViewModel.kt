@@ -17,7 +17,10 @@ class WeatherViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
+    private var lastLocationState: com.smart.keuneunong.ui.location.LocationState? = null
+
     fun loadWeather(locationState: com.smart.keuneunong.ui.location.LocationState? = null) {
+        lastLocationState = locationState
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
@@ -49,5 +52,9 @@ class WeatherViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun refresh() {
+        loadWeather(lastLocationState)
     }
 }
