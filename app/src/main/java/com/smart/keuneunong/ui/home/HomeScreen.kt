@@ -106,7 +106,7 @@ fun HomeContent(
                 .fillMaxSize()
                 .background(Color(0xFFF6F8FB))
                 .padding(contentPadding),
-        contentPadding = PaddingValues(bottom = 16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         /** ---------- QUICK INFO CARDS ---------- **/
@@ -128,7 +128,7 @@ fun HomeContent(
                 QuickStatCard(
                     icon = "🌕",
                     title = "Keuneunong",
-                    value = "Muda",
+                    value = "Ngieng",
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatCard(

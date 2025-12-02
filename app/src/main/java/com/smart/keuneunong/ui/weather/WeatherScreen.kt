@@ -152,15 +152,9 @@ fun KeuneunongContext(hijriDate: String, contextText: String) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Keuneunong",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Blue800
-                )
-                Text(
                     text = hijriDate,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = Blue800
                 )
             }
