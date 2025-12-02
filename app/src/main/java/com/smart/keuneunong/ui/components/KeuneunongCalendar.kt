@@ -66,11 +66,6 @@ fun CalendarComponent(
                         fontWeight = FontWeight.Bold,
                         color = Gray900
                     )
-                    Text(
-                        text = "Jumadil Awal 1447 H",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray500
-                    )
                 }
 
                 IconButton(onClick = onNextMonth) {

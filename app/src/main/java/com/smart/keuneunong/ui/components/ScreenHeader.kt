@@ -241,24 +241,24 @@ private fun getWeatherIcon(condition: String?): ImageVector {
 private fun getActivityIcons(condition: String?): List<ImageVector> {
     return when (condition?.lowercase()) {
         "cerah", "sunny", "clear" -> listOf(
-            Icons.AutoMirrored.Filled.DirectionsWalk, // jalan kaki
-            Icons.AutoMirrored.Filled.DirectionsBike, // sepeda
+            Icons.AutoMirrored.Filled.DirectionsWalk,
+            Icons.AutoMirrored.Filled.DirectionsBike,
             Icons.Filled.WbSunny
         )
         "berawan", "cloudy", "overcast" -> listOf(
-            Icons.AutoMirrored.Outlined.MenuBook,      // membaca
-            Icons.Filled.WbCloudy,                    // awan
-            Icons.Filled.Cloud                        // istirahat/bersantai
+            Icons.AutoMirrored.Outlined.MenuBook,
+            Icons.Filled.WbCloudy,
+            Icons.Filled.Cloud
         )
         "hujan", "rain", "rainy", "drizzle", "shower" -> listOf(
-            Icons.Filled.Umbrella,                    // payung
-            Icons.Filled.Cloud,                       // awan/hujan
-            Icons.AutoMirrored.Outlined.MenuBook      // membaca di rumah
+            Icons.Filled.Umbrella,
+            Icons.Filled.Cloud,
+            Icons.AutoMirrored.Outlined.MenuBook
         )
         "badai", "thunderstorm", "storm" -> listOf(
-            Icons.Filled.Umbrella,                    // payung
-            Icons.Filled.Thunderstorm,                // badai
-            Icons.Filled.Cloud                        // awan gelap
+            Icons.Filled.Umbrella,
+            Icons.Filled.Thunderstorm,
+            Icons.Filled.Cloud
         )
         else -> listOf(
             Icons.AutoMirrored.Filled.DirectionsBike,

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
 import androidx.hilt.navigation.compose.hiltViewModel
+import java.util.Locale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
@@ -203,13 +204,13 @@ fun BottomNavigationBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.TipsAndUpdates,
-                    contentDescription = "Rekomendasi",
+                    contentDescription = "Saran",
                     tint = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5)
                 )
             },
             label = {
                 Text(
-                    text = "Rekomendasi",
+                    text = "Saran",
                     color = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5),
                     fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal
                 )
@@ -238,6 +239,8 @@ fun BottomNavigationBar(
 
 @Composable
 fun KeuneunongPhaseCard(phases: List<com.smart.keuneunong.data.model.KeuneunongPhase>) {
+    val dateFormatter = remember { java.text.SimpleDateFormat("dd MMMM", Locale.getDefault()) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,7 +262,7 @@ fun KeuneunongPhaseCard(phases: List<com.smart.keuneunong.data.model.KeuneunongP
                 FaseInfoRow(
                     icon = phase.icon,
                     title = phase.name,
-                    date = "${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.startDate))} - ${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.endDate))}",
+                    date = "${dateFormatter.format(java.util.Date(phase.startDate))} - ${dateFormatter.format(java.util.Date(phase.endDate))}",
                     description = phase.description + if (phase.activities.isNotEmpty()) "\nAktivitas: ${phase.activities.joinToString(", ")}" else ""
                 )
                 Spacer(modifier = Modifier.height(10.dp))
