@@ -45,7 +45,7 @@ fun HomeScreen(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val repositoryKeuneunong = homeViewModel.repositoryKeuneunong
 
-    ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName ->
+    ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName, weatherViewModel ->
         Scaffold(
             contentWindowInsets = WindowInsets.systemBars,
             bottomBar = {
@@ -60,6 +60,7 @@ fun HomeScreen(
                     0 -> HomeContent(
                         viewModel = homeViewModel,
                         locationViewModel = locationViewModel,
+                        weatherViewModel = weatherViewModel,
                         repositoryKeuneunong = repositoryKeuneunong,
                         contentPadding = innerPadding
                     )
@@ -77,6 +78,7 @@ fun HomeScreen(
 fun HomeContent(
     viewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
+    weatherViewModel: com.smart.keuneunong.ui.weather.WeatherViewModel,
     repositoryKeuneunong: RepositoryKeuneunong,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
@@ -98,7 +100,10 @@ fun HomeContent(
 
     PullToRefreshBox(
         isRefreshing = uiState.isLoading,
-        onRefresh = { viewModel.refresh() },
+        onRefresh = {
+            viewModel.refresh()
+            weatherViewModel.refresh()
+        },
         modifier = Modifier.fillMaxSize()
     ) {
         LazyColumn(

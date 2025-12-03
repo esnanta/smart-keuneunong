@@ -70,7 +70,7 @@ fun ScreenHeader(
                 ),
                 shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
             )
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(horizontal = 20.dp, vertical = 28.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -164,7 +164,10 @@ fun ScreenHeader(
                     }
                 }
 
-                Column(horizontalAlignment = Alignment.End) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
                     if (isLoadingWeather) {
                         // Show skeleton loading for weather data
                         WeatherSkeleton()

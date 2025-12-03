@@ -29,7 +29,7 @@ import java.util.Calendar
 fun ScreenWithHeaderAndDrawer(
     locationViewModel: LocationViewModel,
     weatherViewModel: WeatherViewModel = hiltViewModel(),
-    content: @Composable (PaddingValues, (Triple<Int, Int, Int>) -> String) -> Unit
+    content: @Composable (PaddingValues, (Triple<Int, Int, Int>) -> String, WeatherViewModel) -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -128,7 +128,7 @@ fun ScreenWithHeaderAndDrawer(
                         weatherError = weatherUiState.error,
                         locationViewModel = locationViewModel
                     )
-                    content(innerPadding, getMonthName)
+                    content(innerPadding, getMonthName, weatherViewModel)
                 }
             }
         }
