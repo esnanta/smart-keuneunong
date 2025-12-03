@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Pin
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,12 +19,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AppDrawer(
     onShowLocationPicker: () -> Unit,
-    onShowAboutDialog: () -> Unit
+    onShowAboutDialog: () -> Unit,
+    onShowCityPicker: () -> Unit
 ) {
     ModalDrawerSheet {
         DrawerContent(
             onLocationClick = onShowLocationPicker,
-            onAboutClick = onShowAboutDialog
+            onAboutClick = onShowAboutDialog,
+            onCityPickerClick = onShowCityPicker
         )
     }
 }
@@ -31,7 +34,8 @@ fun AppDrawer(
 @Composable
 fun DrawerContent(
     onLocationClick: () -> Unit,
-    onAboutClick: () -> Unit
+    onAboutClick: () -> Unit,
+    onCityPickerClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -60,6 +64,15 @@ fun DrawerContent(
         HorizontalDivider()
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        NavigationDrawerItem(
+            icon = { Icon(Icons.Default.Pin, contentDescription = null) },
+            label = { Text("Pilih Kota") },
+            selected = false,
+            onClick = onCityPickerClick
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         NavigationDrawerItem(
             icon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
@@ -92,7 +105,7 @@ fun DrawerContent(
         val devs = listOf(
             Triple("Nantha Seutia", "Programmer", "NS"),
             Triple("Syahrul Hamdi", "Programmer", "SH"),
-            Triple("Rahmatsyah", "Pegiat Budaya Aceh", "R"),
+            Triple("Rahmatsyah", "Pegiat Budaya Aceh", "RA"),
             Triple("Nyakman Lamjame", "Pegiat Budaya Aceh", "NL"),
             Triple("Reny Fharina", "Pegiat Budaya Aceh", "RF")
         )

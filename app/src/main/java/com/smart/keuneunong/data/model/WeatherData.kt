@@ -8,5 +8,13 @@ data class WeatherData(
     val weatherIcon: String,
     val feelsLike: Int,
     val location: String,
-    val date: Long
+    val date: Long,
+    val sunrise: String,
+    val sunset: String,
+    val waveHeightMin: Double,
+    val waveHeightMax: Double,
+    val seaWindSpeed: Int,
+    val seaWindDirection: String,
+    val keuneunongContext: String,
+    val seaConditionSummary: String
 )

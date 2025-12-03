@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -19,7 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.smart.keuneunong.ui.components.CalendarComponent
+import com.smart.keuneunong.ui.components.CalendarSkeleton
 import androidx.hilt.navigation.compose.hiltViewModel
+import java.util.Locale
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
@@ -41,7 +45,7 @@ fun HomeScreen(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val repositoryKeuneunong = homeViewModel.repositoryKeuneunong
 
-    ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName ->
+    ScreenWithHeaderAndDrawer(locationViewModel = locationViewModel) { innerPadding, getMonthName, weatherViewModel ->
         Scaffold(
             contentWindowInsets = WindowInsets.systemBars,
             bottomBar = {
@@ -56,6 +60,7 @@ fun HomeScreen(
                     0 -> HomeContent(
                         viewModel = homeViewModel,
                         locationViewModel = locationViewModel,
+                        weatherViewModel = weatherViewModel,
                         repositoryKeuneunong = repositoryKeuneunong,
                         contentPadding = innerPadding
                     )
@@ -68,10 +73,12 @@ fun HomeScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     viewModel: HomeViewModel,
     locationViewModel: LocationViewModel,
+    weatherViewModel: com.smart.keuneunong.ui.weather.WeatherViewModel,
     repositoryKeuneunong: RepositoryKeuneunong,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues
@@ -85,16 +92,32 @@ fun HomeContent(
         else -> locationViewModel.getCityName(5.1801, 97.1507)
     }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF6F8FB))
-            .padding(contentPadding),
-        contentPadding = PaddingValues(bottom = 16.dp),
+    // Defer calendar loading until after initial composition
+    // This prevents blocking the main thread during UI rendering
+    LaunchedEffect(Unit) {
+        viewModel.loadInitialCalendar()
+    }
+
+    PullToRefreshBox(
+        isRefreshing = uiState.isLoading,
+        onRefresh = {
+            viewModel.refresh()
+            weatherViewModel.refresh()
+        },
+        modifier = Modifier.fillMaxSize()
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF6F8FB))
+                .padding(contentPadding),
+        contentPadding = PaddingValues(vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         /** ---------- QUICK INFO CARDS ---------- **/
         item {
+            val hijriDate = remember { com.smart.keuneunong.utils.DateUtils.getCurrentHijriDate() }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -102,15 +125,15 @@ fun HomeContent(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 QuickStatCard(
-                    icon = com.smart.keuneunong.utils.DateUtils.getCurrentDay().toString(),
-                    title = "Bulan",
-                    value = com.smart.keuneunong.utils.DateUtils.getMonthName(com.smart.keuneunong.utils.DateUtils.getCurrentMonth()),
+                    icon = hijriDate.day.toString(),
+                    title = "Uroe Buleun",
+                    value = com.smart.keuneunong.utils.DateUtils.getUroeBuleunMonthName(hijriDate.month),
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatCard(
                     icon = "🌕",
                     title = "Keuneunong",
-                    value = "Muda",
+                    value = "Ngieng",
                     modifier = Modifier.weight(1f)
                 )
                 QuickStatCard(
@@ -125,14 +148,32 @@ fun HomeContent(
         /** ---------- KALENDER ---------- **/
         item {
             Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                CalendarComponent(
-                    currentMonth = uiState.currentMonth,
-                    currentYear = uiState.currentYear,
-                    calendarDays = uiState.calendarDays,
-                    onPreviousMonth = viewModel::onPreviousMonth,
-                    onNextMonth = viewModel::onNextMonth,
-                    getMonthName = viewModel::getMonthName
-                )
+                if (uiState.isLoading && uiState.calendarDays.isEmpty()) {
+                    // Show skeleton loading while calendar is loading for first time
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(8.dp, RoundedCornerShape(24.dp)),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.White
+                        )
+                    ) {
+                        CalendarSkeleton(
+                            modifier = Modifier.padding(20.dp)
+                        )
+                    }
+                } else {
+                    // Show actual calendar data
+                    CalendarComponent(
+                        currentMonth = uiState.currentMonth,
+                        currentYear = uiState.currentYear,
+                        calendarDays = uiState.calendarDays,
+                        onPreviousMonth = viewModel::onPreviousMonth,
+                        onNextMonth = viewModel::onNextMonth,
+                        getMonthName = viewModel::getMonthName
+                    )
+                }
             }
         }
 
@@ -144,6 +185,7 @@ fun HomeContent(
         }
 
         item { Spacer(modifier = Modifier.height(24.dp)) }
+        }
     }
 }
 
@@ -203,13 +245,13 @@ fun BottomNavigationBar(
             icon = {
                 Icon(
                     imageVector = Icons.Default.TipsAndUpdates,
-                    contentDescription = "Rekomendasi",
+                    contentDescription = "Saran",
                     tint = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5)
                 )
             },
             label = {
                 Text(
-                    text = "Rekomendasi",
+                    text = "Saran",
                     color = if (selectedTab == 2) Color(0xFF1976D2) else Color(0xFFB0BEC5),
                     fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal
                 )
@@ -238,6 +280,8 @@ fun BottomNavigationBar(
 
 @Composable
 fun KeuneunongPhaseCard(phases: List<com.smart.keuneunong.data.model.KeuneunongPhase>) {
+    val dateFormatter = remember { java.text.SimpleDateFormat("dd MMMM", Locale.getDefault()) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -259,7 +303,7 @@ fun KeuneunongPhaseCard(phases: List<com.smart.keuneunong.data.model.KeuneunongP
                 FaseInfoRow(
                     icon = phase.icon,
                     title = phase.name,
-                    date = "${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.startDate))} - ${java.text.SimpleDateFormat("dd MMMM").format(java.util.Date(phase.endDate))}",
+                    date = "${dateFormatter.format(java.util.Date(phase.startDate))} - ${dateFormatter.format(java.util.Date(phase.endDate))}",
                     description = phase.description + if (phase.activities.isNotEmpty()) "\nAktivitas: ${phase.activities.joinToString(", ")}" else ""
                 )
                 Spacer(modifier = Modifier.height(10.dp))

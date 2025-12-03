@@ -66,11 +66,6 @@ fun CalendarComponent(
                         fontWeight = FontWeight.Bold,
                         color = Gray900
                     )
-                    Text(
-                        text = "Jumadil Awal 1447 H",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Gray500
-                    )
                 }
 
                 IconButton(onClick = onNextMonth) {
@@ -149,15 +144,20 @@ fun CalendarDayCell(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             ) {
 
-                Text(
-                    text = dayData.weatherEmoji,
-                    fontSize = 14.sp
-                )
+                if (dayData.weatherEmoji != null) {
+                    Text(
+                        text = dayData.weatherEmoji,
+                        fontSize = 16.sp,
+                        modifier = Modifier.height(20.dp) // Increased height for better display
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(20.dp)) // Placeholder to maintain alignment
+                }
 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Day number with highlight for current day
                 Box(
@@ -223,12 +223,13 @@ fun CalendarDayCell(
  * Helper function untuk mendapatkan warna berdasarkan kategori curah hujan
  */
 @Composable
-private fun getRainfallColor(category: RainfallCategory): Color {
-    return when (category) {
+private fun getRainfallColor(category: String?): Color {
+    return when (category?.let { RainfallCategory.valueOf(it) }) {
         RainfallCategory.TINGGI -> RainfallHigh
         RainfallCategory.SEDANG -> RainfallMedium
         RainfallCategory.RENDAH -> RainfallLow
         RainfallCategory.SANGAT_RENDAH -> RainfallVeryLow
+        null -> Color.Transparent
     }
 }
 

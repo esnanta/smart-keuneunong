@@ -1,7 +1,7 @@
 package com.smart.keuneunong.di
 
+import com.smart.keuneunong.data.repository.WeatherRepositoryImpl
 import com.smart.keuneunong.domain.repository.WeatherRepository
-import com.smart.keuneunong.domain.repository.WeatherRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

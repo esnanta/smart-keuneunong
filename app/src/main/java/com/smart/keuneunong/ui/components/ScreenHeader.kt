@@ -5,19 +5,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Thunderstorm
 import androidx.compose.material.icons.filled.Umbrella
 import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -74,7 +70,7 @@ fun ScreenHeader(
                 ),
                 shape = RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)
             )
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(horizontal = 20.dp, vertical = 28.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
@@ -136,22 +132,7 @@ fun ScreenHeader(
                     // Weather info from API
                     when {
                         isLoadingWeather -> {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.padding(top = 4.dp)
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(12.dp),
-                                    color = Color.White,
-                                    strokeWidth = 1.5.dp
-                                )
-                                Text(
-                                    text = "Memuat cuaca...",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFFBBDEFB)
-                                )
-                            }
+                            LocationSkeleton(modifier = Modifier.padding(top = 4.dp))
                         }
                         weatherError != null -> {
                             Text(
@@ -183,8 +164,14 @@ fun ScreenHeader(
                     }
                 }
 
-                Column(horizontalAlignment = Alignment.End) {
-                    if (weatherData != null && !isLoadingWeather && weatherError == null) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    modifier = Modifier.padding(top = 4.dp)
+                ) {
+                    if (isLoadingWeather) {
+                        // Show skeleton loading for weather data
+                        WeatherSkeleton()
+                    } else if (weatherData != null && weatherError == null) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -208,9 +195,15 @@ fun ScreenHeader(
                             color = Color(0xFFBBDEFB),
                             modifier = Modifier.padding(top = 2.dp)
                         )
+                        Text(
+                            text = "Terasa seperti ${weatherData.feelsLike}°C",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFFBBDEFB),
+                            modifier = Modifier.padding(top = 2.dp)
+                        )
                     } else {
                         Icon(
-                            imageVector = getWeatherIcon(weatherData?.condition),
+                            imageVector = getWeatherIcon(null),
                             contentDescription = null,
                             tint = Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.size(28.dp)
@@ -235,24 +228,24 @@ private fun getWeatherIcon(condition: String?): ImageVector {
 private fun getActivityIcons(condition: String?): List<ImageVector> {
     return when (condition?.lowercase()) {
         "cerah", "sunny", "clear" -> listOf(
-            Icons.AutoMirrored.Filled.DirectionsWalk, // jalan kaki
-            Icons.AutoMirrored.Filled.DirectionsBike, // sepeda
+            Icons.AutoMirrored.Filled.DirectionsWalk,
+            Icons.AutoMirrored.Filled.DirectionsBike,
             Icons.Filled.WbSunny
         )
         "berawan", "cloudy", "overcast" -> listOf(
-            Icons.AutoMirrored.Outlined.MenuBook,      // membaca
-            Icons.Filled.WbCloudy,                    // awan
-            Icons.Filled.Cloud                        // istirahat/bersantai
+            Icons.AutoMirrored.Outlined.MenuBook,
+            Icons.Filled.WbCloudy,
+            Icons.Filled.Cloud
         )
         "hujan", "rain", "rainy", "drizzle", "shower" -> listOf(
-            Icons.Filled.Umbrella,                    // payung
-            Icons.Filled.Cloud,                       // awan/hujan
-            Icons.AutoMirrored.Outlined.MenuBook      // membaca di rumah
+            Icons.Filled.Umbrella,
+            Icons.Filled.Cloud,
+            Icons.AutoMirrored.Outlined.MenuBook
         )
         "badai", "thunderstorm", "storm" -> listOf(
-            Icons.Filled.Umbrella,                    // payung
-            Icons.Filled.Thunderstorm,                // badai
-            Icons.Filled.Cloud                        // awan gelap
+            Icons.Filled.Umbrella,
+            Icons.Filled.Thunderstorm,
+            Icons.Filled.Cloud
         )
         else -> listOf(
             Icons.AutoMirrored.Filled.DirectionsBike,

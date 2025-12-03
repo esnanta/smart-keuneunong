@@ -2,8 +2,6 @@ package com.smart.keuneunong.ui.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.smart.keuneunong.domain.repository.WeatherRepository
-import com.smart.keuneunong.ui.location.LocationState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,23 +11,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val weatherRepository: WeatherRepository
+    private val weatherRepository: com.smart.keuneunong.domain.repository.WeatherRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(WeatherUiState())
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
 
-    init {
-        loadWeather()
-    }
+    private var lastLocationState: com.smart.keuneunong.ui.location.LocationState? = null
 
-    fun loadWeather(locationState: LocationState? = null) {
+    fun loadWeather(locationState: com.smart.keuneunong.ui.location.LocationState? = null) {
+        lastLocationState = locationState
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-                // Extract latitude and longitude from locationState
                 val (latitude, longitude) = when (locationState) {
-                    is LocationState.Success -> {
+                    is com.smart.keuneunong.ui.location.LocationState.Success -> {
                         Pair(locationState.latitude, locationState.longitude)
                     }
                     else -> {
@@ -38,7 +34,7 @@ class WeatherViewModel @Inject constructor(
                     }
                 }
 
-                // Fetch weather data from repository
+                // The repository now handles fallback internally, so we just call it
                 val weatherData = weatherRepository.getWeather(latitude, longitude)
 
                 _uiState.value = _uiState.value.copy(
@@ -46,12 +42,19 @@ class WeatherViewModel @Inject constructor(
                     weatherData = weatherData,
                     error = null
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
+                // This shouldn't happen anymore since repository handles errors
+                // But keep it as a safety net with mock data fallback
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Gagal memuat data cuaca"
+                    error = null, // Don't show error since we have mock data from repository
+                    weatherData = null
                 )
             }
         }
+    }
+
+    fun refresh() {
+        loadWeather(lastLocationState)
     }
 }

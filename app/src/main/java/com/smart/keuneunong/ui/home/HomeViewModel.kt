@@ -21,7 +21,7 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    init {
+    fun loadInitialCalendar() {
         loadCalendar(_uiState.value.currentMonth, _uiState.value.currentYear)
     }
 
@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
         loadCalendar(month, year)
     }
 
-    private fun loadCalendar(month: Int, year: Int, latitude: Double = 5.55, longitude: Double = 95.32) {
+    fun loadCalendar(month: Int, year: Int, latitude: Double = 5.55, longitude: Double = 95.32) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
@@ -81,5 +81,9 @@ class HomeViewModel @Inject constructor(
 
     fun getMonthName(month: Int): String {
         return calendarRepository.getMonthName(month)
+    }
+
+    fun refresh() {
+        loadCalendar(_uiState.value.currentMonth, _uiState.value.currentYear)
     }
 }
