@@ -6,6 +6,8 @@ import com.smart.keuneunong.data.network.WeatherApi
 import com.smart.keuneunong.domain.model.RainfallHistory
 import com.smart.keuneunong.domain.repository.CalendarRepository
 import com.smart.keuneunong.utils.DateUtils
+import java.io.IOException
+import java.net.SocketTimeoutException
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -53,6 +55,7 @@ class CalendarRepositoryImpl @Inject constructor(
         }
 
         return try {
+            Timber.d("Fetching weather data for calendar at lat: $latitude, lon: $longitude")
             val weatherData = weatherApi.getWeather(latitude, longitude)
 
             val today = Calendar.getInstance()
@@ -84,6 +87,7 @@ class CalendarRepositoryImpl @Inject constructor(
                     cal.get(Calendar.DAY_OF_MONTH) to it.weather.firstOrNull()?.main
                 }
 
+            Timber.i("Weather data for calendar fetched successfully")
             days.map { dayData ->
                 if (dayData.day > 0) {
                     val weatherCondition = weatherMap[dayData.day]
@@ -93,15 +97,50 @@ class CalendarRepositoryImpl @Inject constructor(
                     dayData
                 }
             }
-        } catch (e: Exception) {
-            // If API call fails, return days with mock weather emojis based on rainfall category
-            Timber.e(e, "Failed to fetch weather data, using mock data")
+        } catch (e: SocketTimeoutException) {
+            // Specific handling for timeout
+            Timber.e(e, "API request timeout after 10 seconds, falling back to mock weather data based on rainfall category")
             days.map { dayData ->
                 if (dayData.day > 0) {
                     val weatherEmoji = when (dayData.rainfallCategory) {
-                        "Tinggi" -> "🌧️"
-                        "Sedang" -> "☁️"
-                        "Rendah" -> "⛅"
+                        "TINGGI" -> "🌧️"
+                        "SEDANG" -> "☁️"
+                        "RENDAH" -> "⛅"
+                        "SANGAT_RENDAH" -> "☀️"
+                        else -> if (dayData.day % 3 == 0) "☁️" else "☀️" // Simple pattern for mock data
+                    }
+                    dayData.copy(weatherEmoji = weatherEmoji)
+                } else {
+                    dayData
+                }
+            }
+        } catch (e: IOException) {
+            // Network error (no internet, connection failed, etc.)
+            Timber.e(e, "Network error occurred, falling back to mock weather data based on rainfall category")
+            days.map { dayData ->
+                if (dayData.day > 0) {
+                    val weatherEmoji = when (dayData.rainfallCategory) {
+                        "TINGGI" -> "🌧️"
+                        "SEDANG" -> "☁️"
+                        "RENDAH" -> "⛅"
+                        "SANGAT_RENDAH" -> "☀️"
+                        else -> if (dayData.day % 3 == 0) "☁️" else "☀️"
+                    }
+                    dayData.copy(weatherEmoji = weatherEmoji)
+                } else {
+                    dayData
+                }
+            }
+        } catch (e: Exception) {
+            // If API call fails for any other reason, return days with mock weather emojis based on rainfall category
+            Timber.e(e, "Failed to fetch weather data, falling back to mock weather data based on rainfall category")
+            days.map { dayData ->
+                if (dayData.day > 0) {
+                    val weatherEmoji = when (dayData.rainfallCategory) {
+                        "TINGGI" -> "🌧️"
+                        "SEDANG" -> "☁️"
+                        "RENDAH" -> "⛅"
+                        "SANGAT_RENDAH" -> "☀️"
                         else -> if (dayData.day % 3 == 0) "☁️" else "☀️" // Simple pattern for mock data
                     }
                     dayData.copy(weatherEmoji = weatherEmoji)

@@ -27,7 +27,7 @@ fun CityPickerDialog(
 ) {
     val cities = listOf(
         CityLocation("Banda Aceh", 5.5483, 95.3238),
-        CityLocation("Pidie Jaya", 5.1229, 96.1413),
+        CityLocation("Sigli", 5.1895, 96.7446),
         CityLocation("Lhokseumawe", 5.1801, 97.1507)
     )
 
